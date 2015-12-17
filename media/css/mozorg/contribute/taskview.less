@@ -7,7 +7,7 @@
 @backgroundColor: #32333a;
 @foregroundColor: #fff;
 @darkForeground: #333;
-@buttonColor: #81d135;
+@buttonColor: #0c99d5;
 @linkColor: #09a7c3;
 
 /* override sandstone base styles */
@@ -40,7 +40,7 @@ h1 {
 }
 
 p {
-    .font-size(18px);
+    .font-size(21px);
 }
 
 a:link,
@@ -61,6 +61,7 @@ main {
     margin: 0 auto;
     padding-left: @gridGutterWidth;
     padding-right: @gridGutterWidth;
+    width: 720px;
 
     .task-heading {
         margin: (@baseLine * 3) auto (@baseLine * 3);
@@ -71,7 +72,7 @@ main {
             margin: 0 auto;
             max-width: 80%;
             .open-sans-light;
-            .font-size(21px);
+            .font-size(24px);
             font-style: italic;
         }
     }
@@ -79,7 +80,7 @@ main {
     .page-title {
         margin-bottom: @baseLine;
         .open-sans-light;
-        .font-size(72px);
+        .font-size(64px);
     }
 }
 
@@ -113,9 +114,13 @@ main {
 
     .one.completed:before,
     .two.completed:before {
-        content: '✓';
-        color: @buttonColor;
+        background: transparent url('/media/img/contribute/signup/complete-icon.svg') -30px -27px no-repeat;
+        background-size: 110px 110px;
+        content: '';
         margin-right: 10px;
+        border: none;
+        width: 60px;
+        height: 63px;
         .font-size(48px);
         line-height: 1;
         vertical-align: bottom;
@@ -127,6 +132,7 @@ main {
     }
 
     h3 {
+        .font-size(32px);
         text-transform: uppercase;
         .open-sans;
         font-weight: bold;
@@ -181,6 +187,7 @@ button {
     margin-top: @baseLine;
     padding: 1rem;
     border: 0;
+    border-radius: 8px;
     width: 100%;
     .font-size(24px);
     text-align: center;
@@ -191,6 +198,10 @@ a.taskview-button {
     &:link,
     &:visited {
         color: #32333a;
+    }
+
+    &:hover {
+        text-decoration: underline;
     }
 }
 

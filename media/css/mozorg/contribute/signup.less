@@ -4,6 +4,10 @@
 
 @import "../../sandstone/lib.less";
 
+.sand #outer-wrapper {
+    background: none;
+}
+
 .page-head {
     padding-top: 5.714em;
 }
@@ -28,53 +32,62 @@ main {
 
     h3 {
         .font-size(19px);
-        cursor: pointer;
 
         &.fx-mobile:before {
-            background-position: -316px 0;
+            background-position: -324px -8px;
         }
 
         &.fx-twitter:before {
-            background-position: -641px 0;
+            background-position: -649px -8px;
         }
 
         &.coding:before {
-            background-position: 0 -216px;
+            background-position: -6px -217px;
         }
 
         &.fxos:before {
-            background-position: -316px -220px;
+            background-position: -324px -219px;
         }
 
         &.devtools:before {
-            background-position: -641px -220px;
+            background-position: -649px -219px;
         }
     }
 
     h3:before {
         display: block;
         content: '';
-        background: transparent url('/media/img/contribute/signup/tasks-sprite.png') 0 0 no-repeat;
+        background: transparent url('/media/img/contribute/signup/tasks-sprite.png') -8px -8px no-repeat;
         margin: 0 auto 20px;
-        width: 210px;
-        height: 210px;
+        border: 2px solid #d1d2d3;
+        border-radius: 50%;
+        width: 194px;
+        height: 194px;
     }
 
     a:link,
     a:visited {
         display: block;
+        color: #0c99d5;
         margin: 0 auto;
         padding: 1rem;
-        border: 1px solid #cacaca;
+        border: 1px solid #d1d2d3;
         border-radius: 8px;
         width: 80%;
         .font-size(1rem);
+    }
+
+    a:hover,
+    a:focus {
+        border-color: #909090;
+        text-decoration: none;
     }
 }
 
 .tooltip {
     position: absolute;
     top: -70px;
+    background-image: none;
     background-color: #fff;
     color: #32333a;
     box-shadow: none;
