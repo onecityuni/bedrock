@@ -1,0 +1,210 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+@import "../sandstone/lib.less";
+
+.circular-image(@color: #333) {
+    display: block;
+    background-color: @color;
+    content: '';
+    margin: 30px auto;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+}
+
+#wrapper {
+    padding-bottom: 0;
+}
+
+#colophon {
+    margin-top: 0;
+}
+
+.wrapper,
+.how {
+    padding-bottom: @baseLine * 2;
+    width: 960px;
+    margin: 0 auto;
+    position: relative;
+}
+
+main {
+    background-color: #F2F2F2;
+
+    p,
+    ul {
+        .font-size(1rem);
+    }
+}
+
+.box-container {
+    padding: 2rem;
+    vertical-align: top;
+}
+
+.orient-left,
+.orient-right {
+    display: inline-block;
+    width: 40%;
+}
+
+.orient-left {
+    margin-right: 3rem;
+}
+
+.lead-in {
+    padding-top: @baseLine * 2;
+    .open-sans-light;
+
+    .wrapper {
+        padding-left: 10px;
+    }
+
+    h2 {
+        .font-size(4rem);
+    }
+
+    h4 {
+        .font-size(1.8rem);
+    }
+
+    p {
+        .font-size(2rem);
+    }
+}
+
+.why {
+    background-color: #fff;
+    padding: 5rem 0 2rem;
+    text-align: center;
+
+    h3 {
+        margin-bottom: 4rem;
+        .font-size(3rem);
+    }
+
+    .box-container {
+        min-height: 380px;
+    }
+
+    .hand-shake:before {
+        background: url(/media/img/mozorg/about/lean-data/shake.png) 50% 50% no-repeat;
+        .circular-image(#5BC0A4);
+    }
+
+    .lock:before {
+        background: url(/media/img/mozorg/about/lean-data/lock.png) 50% 50% no-repeat;
+        .circular-image(#5BC0A4);
+    }
+}
+
+.how {
+    text-align: center;
+
+    h3 {
+        position: relative;
+        display: inline-block;
+        background-color: #20B7E3;
+        color: #fff;
+        margin: 4rem 0 2rem;
+        padding: 10px 20px 20px;
+        border-radius: 8px;
+        .font-size(4rem);
+        .open-sans-light;
+    }
+
+    h3:after {
+        position: absolute;
+        content: '';
+        top: 93px;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-left: 14px solid transparent;
+        border-right: 14px solid transparent;
+        border-top: 15px solid #20B7E3;
+    }
+
+    h4 {
+        margin-top: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #edecec;
+        .font-size(2.5rem);
+    }
+
+    ul {
+        margin: 0 0 @baseLine 250px;
+        padding: 0;
+    }
+
+    .box-container {
+        background-color: #fff;
+    }
+
+    .topic-content {
+        margin-top: 3rem;
+        text-align: left;
+        .clearfix;
+
+        img {
+            float: left;
+            margin: -35px 50px 0 0;
+        }
+
+        p {
+            font-style: italic;
+        }
+    }
+}
+
+.toolkit {
+    background-color: #01A5DE;
+    color: #fff;
+    padding: 4rem;
+    text-align: center;
+
+    h3 {
+        color: #fff;
+        .font-size(4rem);
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .box-container {
+        display: inline-block;
+        border: 1px solid #6DBEE1;
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.08) inset;
+        width: 40%;
+    }
+
+    .box-container:first-child {
+        margin-right: 3em;
+    }
+
+    li:before {
+        display: block;
+        content: '';
+        margin: 0 auto 10px;
+        width: 55px;
+        height: 80px;
+    }
+
+    li.implement-ldp:before {
+        .at2x('/media/img/mozorg/about/lean-data/doc.png', 55px, 80px);
+    }
+
+    li.spreadsheet:before {
+        .at2x('/media/img/mozorg/about/lean-data/code.png', 55px, 80px);
+    }
+
+    a:link,
+    a:visited {
+        color: #fff;
+    }
+}
