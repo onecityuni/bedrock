@@ -8,7 +8,7 @@ from selenium.common.exceptions import TimeoutException
 from pages.home import HomePage
 
 
-@pytest.mark.sanity
+@pytest.mark.smoke
 @pytest.mark.nondestructive
 def test_promo_grid_is_displayed(base_url, selenium):
     page = HomePage(base_url, selenium).open()
@@ -33,7 +33,7 @@ def test_tweet_is_not_present(base_url, selenium):
     assert not page.is_tweet_promo_present
 
 
-@pytest.mark.sanity
+@pytest.mark.smoke
 @pytest.mark.nondestructive
 def test_download_button_is_displayed(base_url, selenium):
     page = HomePage(base_url, selenium).open()
@@ -48,31 +48,33 @@ def test_upcoming_events_are_displayed(base_url, selenium):
     assert events.is_events_list_displayed
 
 
-@pytest.mark.sanity
+@pytest.mark.smoke
 @pytest.mark.nondestructive
-def test_mozilla_newsletter_default_values(base_url, selenium):
+def test_newsletter_default_values(base_url, selenium):
     page = HomePage(base_url, selenium).open()
-    page.mozilla_newsletter.expand_form()
-    assert '' == page.mozilla_newsletter.email
-    assert 'United States' == page.mozilla_newsletter.country
-    assert not page.mozilla_newsletter.privacy_policy_accepted
-    assert page.mozilla_newsletter.is_privacy_policy_link_displayed
+    page.newsletter.expand_form()
+    assert '' == page.newsletter.email
+    assert 'United States' == page.newsletter.country
+    assert not page.newsletter.privacy_policy_accepted
+    assert page.newsletter.is_privacy_policy_link_displayed
 
 
-def test_mozilla_newsletter_successful_sign_up(base_url, selenium):
+@pytest.mark.flaky(reruns=1)
+def test_newsletter_successful_sign_up(base_url, selenium):
     page = HomePage(base_url, selenium).open()
-    newsletter = page.mozilla_newsletter
+    newsletter = page.newsletter
     newsletter.expand_form()
     newsletter.type_email('noreply@mozilla.com')
     newsletter.select_country('United Kingdom')
+    newsletter.select_text_format()
     newsletter.accept_privacy_policy()
     newsletter.click_sign_me_up()
     assert newsletter.sign_up_successful
 
 
 @pytest.mark.nondestructive
-def test_mozilla_newsletter_sign_up_fails_when_missing_required_fields(base_url, selenium):
+def test_newsletter_sign_up_fails_when_missing_required_fields(base_url, selenium):
     page = HomePage(base_url, selenium).open()
-    page.mozilla_newsletter.expand_form()
+    page.newsletter.expand_form()
     with pytest.raises(TimeoutException):
-        page.mozilla_newsletter.click_sign_me_up()
+        page.newsletter.click_sign_me_up()

@@ -8,7 +8,7 @@ from selenium.common.exceptions import TimeoutException
 from pages.contribute.contribute import ContributePage
 
 
-@pytest.mark.sanity
+@pytest.mark.smoke
 @pytest.mark.nondestructive
 def test_play_video(base_url, selenium):
     page = ContributePage(base_url, selenium).open()
@@ -23,7 +23,7 @@ def test_next_event_is_displayed(base_url, selenium):
     assert page.next_event_is_displayed
 
 
-@pytest.mark.sanity
+@pytest.mark.smoke
 @pytest.mark.nondestructive
 def test_newsletter_default_values(base_url, selenium):
     page = ContributePage(base_url, selenium).open()
@@ -36,6 +36,7 @@ def test_newsletter_default_values(base_url, selenium):
     assert page.newsletter.is_privacy_policy_link_displayed
 
 
+@pytest.mark.flaky(reruns=1)
 def test_newsletter_successful_sign_up(base_url, selenium):
     page = ContributePage(base_url, selenium).open()
     page.newsletter.expand_form()

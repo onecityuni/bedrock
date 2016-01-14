@@ -46,12 +46,12 @@ following command:
 See the `Jasmine`_ documentation for tips on how to write JS behavioral or unit
 tests. We also use `Sinon`_ for creating test spies, stubs and mocks.
 
-Running Selenium tests
-----------------------
+Running functional tests
+------------------------
 
 .. Note::
 
-  Before running the Selenium tests, please make sure to follow the bedrock
+  Before running the functional tests, please make sure to follow the bedrock
   :ref:`installation docs<install>`, including the database sync that is needed
   to pull in external data such as event/blog feeds etc. These are required for
   some of the tests to pass.
@@ -60,19 +60,25 @@ To run the full functional test suite against your local bedrock instance:
 
 .. code-block:: bash
 
-    $ py.test --driver Firefox --html tests/functional/results.html -n auto tests/functional/
+    $ py.test --driver Firefox --html tests/functional/results.html tests/functional/
 
 This will run all test suites found in the ``tests/functional`` directory and
 assumes you have bedrock running at ``localhost`` on port ``8000``. Results will
-be reported in ``tests/functional/results.html`` and tests will run in parallel
-according to the number of cores available.
+be reported in ``tests/functional/results.html``.
+
+By default, tests will run one at a time. This is the safest way to ensure
+predictable results, due to
+`bug 1230105 <https://bugzilla.mozilla.org/show_bug.cgi?id=1230105>`_.
+If you want to run tests in parallel (this should be safe when running against
+a deployed instance), you can add ``-n auto`` to the command line. Replace
+``auto`` with an integer if you want to set the maximum number of concurrent
+processes.
 
 .. Note::
 
-    For the above command to work, Firefox needs to be installed in a
-    predictable location for your operating system. For details on how to
-    specify the location of Firefox, or running the tests against alternative
-    browsers, refer to the `pytest-selenium documentation`_.
+    There are some functional tests that do not require a browser. These can
+    take a long time to run, especially if they're not running in parallel.
+    To skip these tests, add ``-m 'not headless'`` to your command line.
 
 To run a single test file you must tell py.test to execute a specific file
 e.g. ``tests/functional/test_newsletter.py``:
@@ -81,12 +87,26 @@ e.g. ``tests/functional/test_newsletter.py``:
 
     $ py.test --driver Firefox --html tests/functional/results.html -n auto tests/functional/test_newsletter.py
 
+To run a single test you can filter using the ``-k`` argument supplied with a keyword
+e.g. ``-k test_successful_sign_up``:
+
+.. code-block:: bash
+
+  $ py.test --driver Firefox --html tests/functional/results.html -n auto tests/functional/test_newsletter.py -k test_successful_sign_up
+
 You can also easily run the tests against any bedrock environment by specifying the
 ``--base-url`` argument. For example, to run all functional tests against dev:
 
 .. code-block:: bash
 
     $ py.test --base-url https://www-dev.allizom.org --driver Firefox --html tests/functional/results.html -n auto tests/functional/
+
+.. Note::
+
+    For the above commands to work, Firefox needs to be installed in a
+    predictable location for your operating system. For details on how to
+    specify the location of Firefox, or running the tests against alternative
+    browsers, refer to the `pytest-selenium documentation`_.
 
 For more information on command line options, see the `pytest documentation`_.
 
@@ -145,20 +165,20 @@ you can also read the `pytest markers`_ documentation for more options.
         assert not page.text_format_selected
         assert not page.privacy_policy_accepted
 
-Sanity tests
-~~~~~~~~~~~~
+Smoke tests
+~~~~~~~~~~~
 
-Sanity tests are run as part of bedrocks deployment pipeline. These should be considered
+Smoke tests are run as part of bedrocks deployment pipeline. These should be considered
 to be critical tests which benefit from being run automatically after every commit to
 master. Only the full suite of functional tests are run after deployment to staging. If
-your test should be marked as a santity test you will need to apply a ``santiy`` marker
+your test should be marked as a smoke test you will need to apply a ``smoke`` marker
 to it.
 
 .. code-block:: python
 
     import pytest
 
-    @pytest.mark.sanity
+    @pytest.mark.smoke
     @pytest.mark.nondestructive
     def test_newsletter_default_values(base_url, selenium):
         page = NewsletterPage(base_url, selenium).open()
@@ -169,15 +189,38 @@ to it.
         assert not page.text_format_selected
         assert not page.privacy_policy_accepted
 
-You can run sanity tests only by adding ``-m sanity`` when running the test suite on the
+You can run smoke tests only by adding ``-m smoke`` when running the test suite on the
 command line.
 
 .. Note::
 
   Tests that rely on long-running timeouts, cron jobs, or that test for locale specific
-  interactions should not be marked as a sanity test. We should try and ensure that the
-  suite of sanity tests are quick to run, and they should not have a dependency on
+  interactions should not be marked as a smoke test. We should try and ensure that the
+  suite of smoke tests are quick to run, and they should not have a dependency on
   checking out and building the full site.
+
+Sanity tests
+~~~~~~~~~~~~
+
+Sanity tests are considered to be our most critical tests that must pass in a wide range
+of web browsers, including old versions of Internet Explorer. Sanity tests are run
+automatically post deployment on a wider range of browsers & platforms than we run the
+full suite against. The number of sanity tests we run should remain small, but cover our
+most critical pages where legacy browser support is important.
+
+.. code-block:: python
+
+    import pytest
+
+    @pytest.mark.sanity
+    @pytest.mark.nondestructive
+    def test_click_download_button(base_url, selenium):
+        page = FirefoxNewPage(base_url, selenium).open()
+        page.download_firefox()
+        assert page.is_thank_you_message_displayed
+
+You can run sanity tests only by adding ``-m sanity`` when running the test suite on the
+command line.
 
 Waits and Expected Conditions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

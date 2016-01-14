@@ -8,7 +8,7 @@
     var $document = $(document);
     var $body = $('body');
 
-    if (window.isFirefox()) {
+    if (window.Mozilla.Client.isFirefox) {
         $body.addClass('is-firefox');
     } else {
         $body.addClass('not-firefox');
@@ -207,40 +207,6 @@
             offset: '100%'
         });
     });
-
-    // Open embed in a new tab/window
-    $('a.video-open').on('click', function(e) {
-        e.preventDefault();
-        window.open(this.href);
-    });
-
-/* Hide the embed for now
-    // Play videos in a modal
-    $('a.video-open').attr('role', 'button').on('click', function(e) {
-        e.preventDefault();
-
-        var $this = $(this);
-        var embedSrc = $this.data('embed-src');
-        var embedWrap = $('#' + $this.data('element-id'));
-
-        Mozilla.Modal.createModal(this, embedWrap, {
-            title: '',
-            onCreate: function() {
-                embedWrap.find('.modal-video-frame').attr('src', embedSrc);
-            },
-            onDestroy: function() {
-                embedWrap.find('.modal-video-frame').removeAttr('src');
-            }
-        });
-
-        // Track the click and record the video ID
-        window.dataLayer.push({
-            'event': 'smarton-interactions',
-            'interaction': 'video modal open',
-            'video': $this.data('element-id')
-        });
-    });
-*/
 
     // Track user scrolling through each section down the page
     $('.main .section').each(function() {

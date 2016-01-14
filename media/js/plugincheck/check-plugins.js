@@ -1,6 +1,8 @@
 $(function() {
     'use strict';
 
+    var client = window.Mozilla.Client;
+
     var outdatedFx = $('.version-message-container');
     var wrapper = $('#wrapper');
     var $loader = $('.plugincheck-loader');
@@ -157,17 +159,21 @@ $(function() {
     }
 
     // show main download button to non Fx traffic
-    if(!isFirefox() && !isLikeFirefox() ) {
+    if(!client.isFirefox && !client.isLikeFirefox) {
         wrapper.addClass('non-fx');
     }
 
     // show for outdated Fx versions
-    if (isFirefox() && !isFirefoxUpToDate() && !isFirefoxESR()) {
-        outdatedFx.show();
+    if (client.isFirefoxDesktop || client.isFirefoxAndroid) {
+        client.getFirefoxDetails(function(data) {
+            if (!data.isUpToDate && !data.isESR) {
+                outdatedFx.show();
+            }
+        });
     }
 
     // only execute the plugincheck code if this is Firefox
-    if (isFirefox() || isLikeFirefox()) {
+    if (client.isFirefoxDesktop || client.isFirefoxAndroid || client.isLikeFirefox) {
 
         $loader.removeClass('hidden');
 

@@ -6,36 +6,33 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 
 from page import Page, PageRegion
-from regions.newsletter import NewsletterEmbedForm, MozillaNewsletterEmbedForm
+from regions.newsletter import NewsletterEmbedForm
 
 
 class BasePage(Page):
 
     _url = '{base_url}/{locale}'
 
-    def __init__(self, base_url, selenium, locale='en-US'):
-        super(Page, self).__init__(base_url, selenium, locale=locale)
+    def __init__(self, base_url, selenium, locale='en-US', **kwargs):
+        super(BasePage, self).__init__(base_url, selenium, locale=locale, **kwargs)
 
     def wait_for_page_to_load(self):
+        super(BasePage, self).wait_for_page_to_load()
         el = self.find_element((By.TAG_NAME, 'html'))
         self.wait.until(lambda s: 'loaded' in el.get_attribute('class'))
         return self
 
     @property
     def navigation(self):
-        return self.Navigation(self.base_url, self.selenium)
+        return self.Navigation(self)
 
     @property
     def footer(self):
-        return self.Footer(self.base_url, self.selenium)
+        return self.Footer(self)
 
     @property
     def newsletter(self):
-        return NewsletterEmbedForm(self.base_url, self.selenium)
-
-    @property
-    def mozilla_newsletter(self):
-        return MozillaNewsletterEmbedForm(self.base_url, self.selenium)
+        return NewsletterEmbedForm(self)
 
     class Navigation(PageRegion):
 
@@ -92,4 +89,4 @@ class BasePage(Page):
         def select_language(self, value):
             el = self.find_element(self._language_locator)
             Select(el).select_by_value(value)
-            self.wait.until(lambda s: value in s.current_url)
+            self.wait.until(lambda s: '/{0}/'.format(value) in s.current_url)

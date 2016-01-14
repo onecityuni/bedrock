@@ -4,7 +4,7 @@
 
 {% extends "firefox/base-resp.html" %}
 
-{% set_lang_files "firefox/feedback" %}
+{% set_lang_files "firefox/feedback" "firefox/sendto" %}
 
 {% block page_title_prefix %}{% endblock %}
 {% block page_title %}{{_('Firefox Feedback')}}{% endblock %}
@@ -28,7 +28,14 @@
   <div class="primary">
     <h1 class="headline">{{ _('Thank you for your feedback!') }}</h1>
     <p class="tagline">{{ _('We’re so glad you’re happy with Firefox.') }}</p>
-    <p class="copy">{{ _('Firefox is non-profit, non-corporate, non-compromised. Help protect the largest global public resource we have — the Web — by sharing Firefox with your friends.') }}</p>
+
+    {% if LANG == 'en-US' and donate_stars_url %}
+      <p class="copy">{{ _('Mozilla, the non-profit behind Firefox, relies on donations. Would you like to make a donation to help us carry out our mission to keep the Web open and free?') }}</p>
+
+      <p class="copy"><a href="{{ donate_stars_url }}" class="button-flat" rel="external">{{ _('Donate Now') }}</a></p>
+    {% else %}
+      <p class="copy">{{ _('Firefox is non-profit, non-corporate, non-compromised. Help protect the largest global public resource we have — the Web — by sharing Firefox with your friends.') }}</p>
+    {% endif %}
 
     {% set share_urls = {
       'twitter': 'http://mzl.la/1MZOYmZ',
@@ -54,9 +61,9 @@
     </aside>
 
     <aside class="action-secondary cta-android">
-      <a data-name="CTA Firefox for Android" href="{{ url('firefox.sms') }}?utm_source=happyheartbeat&amp;utm_medium=heartbeat&amp;utm_content=AndroidCTA&amp;utm_campaign=FirefoxforAndroid">
-        <h2>{{ _('Get Firefox on your Android') }}</h2>
-        <p>{{ _('Send yourself a text to download Firefox for Android, a better mobile browser.') }}</p>
+      <a data-name="CTA Firefox for Android" href="{{ url('firefox.android.index') }}?utm_source=happyheartbeat&amp;utm_medium=heartbeat&amp;utm_content=AndroidCTA&amp;utm_campaign=FirefoxforAndroid">
+        <h2>{{ _('Get Firefox for Android') }}</h2>
+        <p>{{ _('Send Firefox to your smartphone or tablet') }}</p>
       </a>
     </aside>
 
@@ -72,4 +79,3 @@
 {% endblock %}
 
 {% block email_form %}{% endblock %}
-

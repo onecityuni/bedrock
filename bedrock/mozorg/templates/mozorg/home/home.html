@@ -29,7 +29,7 @@
 <!-- validates bing webmaster tools -->
 <meta name="msvalidate.01" content="B7B177115A634927D608514DA17B2574" />
 <!-- YouTube Verification -->
-<meta name="google-site-verification" content="Mef8xJZ1-faaN2AdGdCfRFo5VeoXOSxjXNIzMsxcx94" />
+<meta name="google-site-verification" content="U9a6gH32vLIykvntaDToj-ytYhlZ1AfAgVEKstixQIE" />
 {% endblock %}
 
 {% block extrahead %}
@@ -124,13 +124,13 @@
     <div class="promo-grid-inner">
       <ul class="promo-grid {% if tweets %}has-twitter-promo{% endif %}">
       {# L10n: Begin home page promos. Line breaks are for visual formatting only. #}
-      {% if l10n_has_tag('ios_promo') and waffle.switch('firefox-ios-global') %}
-        <li id="promo-1" class="item promo-large-portrait firefox-ios" data-name="Firefox is now available for iOS" tabindex="0">
-          <h2 class="primary go">{{ _('Firefox is<br> now available<br> for iOS') }}</h2>
-          <a class="panel-link" href="{{ url('firefox.ios') }}">
+      {% if l10n_has_tag('tracking_protection') %}
+        <li id="promo-1" class="item promo-large-portrait private-browsing" tabindex="0">
+          <h2 class="primary go">{{ _('Introducing the new <br>Private Browsing') }}</h2>
+          <a class="panel-link" href="{{ url('firefox.private-browsing') }}" data-promotion-id="promo-1" data-promotion-name="Introducing the new Private Browsing" data-promotion-class="promo-large-portrait" data-promotion-type="tile">
             <div class="secondary">
-              <h3>{{ _('Add it to your iPhone, iPad &amp; iPod touch.') }}</h3>
-              <p class="more">{{ _('Get Firefox for iOS') }}</p>
+              <h3>{{ _('More protection. <br>The most privacy.') }}</h3>
+              <p class="more">{{ _('Try Private Browsing') }}</p>
             </div>
           </a>
         </li>
@@ -218,7 +218,7 @@
         <li id="promo-7" class="item promo-face">
           {{ promo_face(3, 'promo-7') }}
         </li>
-      {% if l10n_has_tag('smarton_promo_tracking') and waffle.switch('tracking-protection') %}
+      {% if l10n_has_tag('smarton_promo_tracking') %}
         <li id="promo-8" class="item promo-small-landscape smarton-tracking" tabindex="0">
           <a class="panel-link" rel="external" href="{{ url('teach.smarton.tracking') }}" data-promotion-id="promo-8" data-promotion-name="Get smart on Tracking" data-promotion-class="promo-small-landscape" data-promotion-type="tile">
             <h2>{{ _('Get smart on Tracking') }}</h2>
@@ -256,13 +256,13 @@
           </a>
         </li>
       {% endif %}
-      {% if l10n_has_tag('tracking_protection') and waffle.switch('tracking-protection') %}
-        <li id="promo-10" class="item promo-large-portrait private-browsing" tabindex="0">
-          <h2 class="primary go">{{ _('Introducing the new <br>Private Browsing') }}</h2>
-          <a class="panel-link" href="{{ url('firefox.private-browsing') }}" data-promotion-id="promo-10" data-promotion-name="Introducing the new Private Browsing" data-promotion-class="promo-large-portrait" data-promotion-type="tile">
+      {% if l10n_has_tag('ios_promo') %}
+        <li id="promo-10" class="item promo-large-portrait firefox-ios" data-name="Firefox is now available for iOS" tabindex="0">
+          <h2 class="primary go">{{ _('Firefox is<br> now available<br> for iOS') }}</h2>
+          <a class="panel-link" href="{{ url('firefox.ios') }}" data-promotion-id="promo-10" data-promotion-name="Firefox is now available for iOS" data-promotion-class="promo-large-portrait" data-promotion-type="tile">
             <div class="secondary">
-              <h3>{{ _('More protection. <br>The most privacy.') }}</h3>
-              <p class="more">{{ _('Try Private Browsing') }}</p>
+              <h3>{{ _('Add it to your iPhone, iPad &amp; iPod touch.') }}</h3>
+              <p class="more">{{ _('Get Firefox for iOS') }}</p>
             </div>
           </a>
         </li>
@@ -291,18 +291,7 @@
           </a>
         </li>
       {% endif %}
-      {# see https://bugzilla.mozilla.org/show_bug.cgi?id=1223622#c26 for details #}
-      {% if LANG == 'en-US' %}
-        <li id="promo-11" class="item promo-large-landscape fundraiser" tabindex="0">
-          <h2 class="primary go">{{ _('Donate to Mozilla,<br> the non-profit behind Firefox.') }}</h2>
-          <a class="panel-link" href="{{ donate_url('promotile') }}" data-promotion-id="promo-11" data-promotion-name="End of year fundraising" data-promotion-class="promo-large-landscape" data-promotion-type="tile">
-            <div class="secondary">
-              <h3>{{ _('Our year-end<br> fundraiser ends Dec 31.') }}</h3>
-              <p class="more">{{ _('Donate now') }}</p>
-            </div>
-          </a>
-        </li>
-      {% elif l10n_has_tag('mdn_10_years') %}
+      {% if l10n_has_tag('mdn_10_years') %}
         <li id="promo-11" class="item promo-large-landscape mdn-10-years" tabindex="0">
           <h2 class="primary go">{{ _('Mozilla Developer Network') }}</h2>
           <a class="panel-link" href="https://developer.mozilla.org/docs/mdn_at_ten?utm_campaign=mdn10&amp;utm_source=mozilla.org&amp;utm_medium=home-tile" data-promotion-id="promo-11" data-promotion-name="Mozilla Developer Network" data-promotion-class="promo-large-portrait" data-promotion-type="tile">
@@ -439,7 +428,7 @@
   <section class="module" id="newsletter-signup">
     <div class="container">
       {% if LANG == 'en-US' %}
-        {{ mozorg_newsletter_form() }}
+        {{ email_newsletter_form(newsletters='mozilla-foundation', title=_('Get Mozilla updates')) }}
       {% else %}
         {{ email_newsletter_form() }}
       {% endif %}

@@ -217,6 +217,11 @@ class TestFirefoxDesktop(TestCase):
 
         # Release
         builds = firefox_desktop.get_filtered_full_builds('release')
+        url = builds[0]['platforms']['win64']['download_url']
+        eq_(parse_qsl(urlparse(url).query)[1], ('os', 'win64'))
+
+        # ESR
+        builds = firefox_desktop.get_filtered_full_builds('esr')
         ok_('win64' not in builds[0]['platforms'])
 
     def test_linux64_build(self):
@@ -226,23 +231,26 @@ class TestFirefoxDesktop(TestCase):
 
     @patch.object(firefox_desktop._storage, 'data',
                   Mock(return_value=dict(FIREFOX_ESR='24.2')))
-    def test_esr_major_versions(self):
+    def test_esr_versions(self):
         """ESR versions should be dynamic based on data."""
         eq_(firefox_desktop.esr_major_versions, [24])
+        eq_(firefox_desktop.esr_minor_versions, ['24.2'])
 
     @patch.object(firefox_desktop._storage, 'data',
                   Mock(return_value=dict(FIREFOX_ESR='24.6.0',
                                          FIREFOX_ESR_NEXT='31.0.0')))
-    def test_esr_major_versions_prev(self):
+    def test_esr_versions_prev(self):
         """ESR versions should show previous when available."""
         eq_(firefox_desktop.esr_major_versions, [24, 31])
+        eq_(firefox_desktop.esr_minor_versions, ['24.6.0', '31.0.0'])
 
     @patch.object(firefox_desktop._storage, 'data',
                   Mock(return_value=dict(LATEST_FIREFOX_VERSION='Phoenix',
                                          FIREFOX_ESR='Albuquerque')))
-    def test_esr_major_versions_no_latest(self):
+    def test_esr_versions_no_latest(self):
         """ESR versions should not blow up if current version is broken."""
         eq_(firefox_desktop.esr_major_versions, [])
+        eq_(firefox_desktop.esr_minor_versions, [])
 
     @patch.object(firefox_desktop._storage, 'data',
                   Mock(return_value=dict(LATEST_FIREFOX_VERSION='18.0.1')))
@@ -307,10 +315,9 @@ class TestFirefoxAndroid(TestCase):
         eq_(firefox_android.latest_version('beta'), '23.0')
 
 
-@patch.object(firefox_ios._storage, 'data',
-              Mock(return_value=dict(version='1.1')))
+@override_settings(FIREFOX_IOS_RELEASE_VERSION='1.2')
 class TestFirefoxIos(TestCase):
 
     def test_latest_release_version(self):
         """latest_version should return the latest release version."""
-        eq_(firefox_ios.latest_version('release'), '1.1')
+        eq_(firefox_ios.latest_version('release'), '1.2')

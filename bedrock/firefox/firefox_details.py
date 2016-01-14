@@ -51,10 +51,21 @@ class FirefoxDesktop(ProductDetails):
     @property
     def esr_major_versions(self):
         versions = []
-        for version in ('esr', 'esr_next'):
-            version_int = self.latest_major_version(version)
+        for channel in ('esr', 'esr_next'):
+            version_int = self.latest_major_version(channel)
             if version_int:
                 versions.append(version_int)
+
+        return versions
+
+    @property
+    def esr_minor_versions(self):
+        versions = []
+        for channel in ('esr', 'esr_next'):
+            version = self.latest_version(channel)
+            version_int = self.latest_major_version(channel)
+            if version and version_int:
+                versions.append(str(version).replace('esr', ''))
 
         return versions
 
@@ -112,9 +123,8 @@ class FirefoxDesktop(ProductDetails):
                 continue
 
             for platform, label in self.platform_labels.iteritems():
-                # Windows 64-bit builds are currently available only on the
-                # Aurora and Beta channel
-                if platform == 'win64' and channel not in ['alpha', 'beta']:
+                # Windows 64-bit builds are not available on the ESR channel yet
+                if platform == 'win64' and channel in ['esr', 'esr_next']:
                     continue
 
                 build_info['platforms'][platform] = {
@@ -263,11 +273,16 @@ class FirefoxIOS(ProductDetails):
     store_url = settings.APPLE_APPSTORE_FIREFOX_LINK
 
     def latest_version(self, channel):
-        version = self.channel_map.get(channel, 'version')
-        return self.mobile_details[version]
+        # temporary solution until iOS builds are in ProductDetails
+        return settings.FIREFOX_IOS_RELEASE_VERSION
 
-    def get_download_url(self, channel='release', type=None):
-        return self.store_url
+    def get_download_url(self, channel='release', locale='en-US'):
+        countries = settings.APPLE_APPSTORE_COUNTRY_MAP
+
+        if locale in countries:
+            return self.store_url.format(country=countries[locale])
+
+        return self.store_url.replace('/{country}/', '/')
 
 
 firefox_desktop = FirefoxDesktop()

@@ -98,7 +98,7 @@ html.oldmac,
 html.oldwin {
     .download-button .unsupported-download {
         margin: 32px 0 0;
-        text-align: left;
+        text-align: center;
     }
 }
 
@@ -449,8 +449,12 @@ html[lang|="en"] #main-headline span:first-child {
 }
 // end scene 2
 
-noscript {
-    .button-white, .button-white:link, .button-white:visited {
+.download-button .unrecognized-download .download-dumb {
+    .download-heading {
+        color: @textColorPrimary;
+    }
+
+    .button-green, .button-green:link, .button-green:visited {
         min-width: 0;
     }
 }
@@ -570,7 +574,6 @@ noscript {
     html.oldmac,
     html.oldwin {
         .download-button .unsupported-download {
-            text-align: left;
             max-width: none;
         }
     }

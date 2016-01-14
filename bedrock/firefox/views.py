@@ -6,7 +6,6 @@
 
 import json
 import re
-from cgi import escape
 
 from django.conf import settings
 from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
@@ -20,6 +19,7 @@ from django.views.generic.base import TemplateView
 import basket
 from bedrock.base.helpers import static
 from bedrock.base.urlresolvers import reverse
+from commonware.response.decorators import xframe_allow
 from lib import l10n_utils
 from lib.l10n_utils.dotlang import _
 from product_details.version_compare import Version
@@ -28,7 +28,7 @@ import waffle
 
 from bedrock.base.geo import get_country_from_request
 from bedrock.firefox.firefox_details import firefox_desktop
-from bedrock.firefox.forms import SMSSendForm, SendToDeviceWidgetForm
+from bedrock.firefox.forms import SendToDeviceWidgetForm
 from bedrock.mozorg.views import process_partnership_form
 from bedrock.mozorg.util import HttpResponseJSON
 from bedrock.releasenotes import version_re
@@ -106,14 +106,14 @@ INSTALLER_CHANNElS = [
 SMS_MESSAGES = {
     'ios': 'ff-ios-download',
     'android': 'SMS_Android',
-    'android-test-modal': 'android-download-notembed',  # test variant
-    'android-test-embed': 'android-download-embed',  # test variant
+    # /firefox/android page variant
+    'android-embed': 'android-download-embed',
 }
 
 EMAIL_MESSAGES = {
     'android': 'download-firefox-android',
-    'android-test-modal': 'get-android-notembed',  # test variant
-    'android-test-embed': 'get-android-embed',  # test variant
+    # /firefox/android page variant
+    'android-embed': 'get-android-embed',
     'ios': 'download-firefox-ios',
     'all': 'download-firefox-mobile',
 }
@@ -164,49 +164,6 @@ def installer_help(request):
     return l10n_utils.render(request, 'firefox/installer-help.html', context)
 
 
-@csrf_exempt
-def sms_send(request):
-    form = SMSSendForm(request.POST or None)
-    if request.method == 'POST':
-        error_msg = _('An error occurred in our system. Please try again later.')
-        error = None
-        if form.is_valid():
-            try:
-                basket.send_sms(form.cleaned_data['number'],
-                                SMS_MESSAGES['android'],
-                                form.cleaned_data['optin'])
-            except basket.BasketException:
-                error = error_msg
-
-        else:
-            number_errors = form.errors.get('number')
-            if number_errors:
-                # form error messages may contain unsanitized user input
-                error = escape(number_errors[0])
-            else:
-                error = error_msg
-
-        if request.is_ajax():
-            # return JSON
-            if error:
-                resp = {
-                    'success': False,
-                    'error': error,
-                }
-            else:
-                resp = {'success': True}
-
-            return HttpResponseJSON(resp)
-        else:
-            if error:
-                form.errors['__all__'] = form.error_class([error])
-            else:
-                return HttpResponseRedirect(reverse('firefox.android.sms-thankyou'))
-
-    return l10n_utils.render(request, 'firefox/android/sms-send.html',
-                             {'sms_form': form})
-
-
 @require_POST
 @csrf_exempt
 def send_to_device_ajax(request):
@@ -227,13 +184,13 @@ def send_to_device_ajax(request):
         phone_or_email = form.cleaned_data.get(data_type)
         platform = form.cleaned_data.get('platform')
 
-        # check for android & valid send to device test value
-        # update email/sms message if conditions match
-        send_to_device_test = request.POST.get('android-send-to-device-test')
-        if (platform == 'android' and send_to_device_test in
-                ['android-test-modal', 'android-test-embed']):
+        # check for customized widget and update email/sms
+        # message if conditions match
+        send_to_device_basket_id = request.POST.get('send-to-device-basket-id')
+        if (platform == 'android' and
+                send_to_device_basket_id == 'android-embed'):
 
-            platform = send_to_device_test
+            platform = 'android-embed'
 
         if data_type == 'number':
             if platform in SMS_MESSAGES:
@@ -382,31 +339,13 @@ def show_devbrowser_firstrun_or_whatsnew(version):
     return False
 
 
-def show_search_firstrun(version):
-    try:
-        version = Version(version)
-    except ValueError:
-        return False
-
-    return version >= Version('34.0')
-
-
-def show_36_firstrun(version):
+def show_36_tour(version):
     try:
         version = Version(version)
     except ValueError:
         return False
 
     return version >= Version('36.0')
-
-
-def show_36_whatsnew_tour(oldversion):
-    try:
-        oldversion = Version(oldversion)
-    except ValueError:
-        return False
-
-    return oldversion < Version('36.0')
 
 
 def show_38_0_5_firstrun_or_whatsnew(version):
@@ -416,6 +355,15 @@ def show_38_0_5_firstrun_or_whatsnew(version):
         return False
 
     return version >= Version('38.0.5')
+
+
+def show_42_whatsnew(version):
+    try:
+        version = Version(version)
+    except ValueError:
+        return False
+
+    return version >= Version('42.0')
 
 
 def show_40_firstrun(version):
@@ -491,7 +439,6 @@ class FirstrunView(LatestFxView):
 
     def get_context_data(self, **kwargs):
         ctx = super(FirstrunView, self).get_context_data(**kwargs)
-
         version = self.kwargs.get('version') or ''
 
         # add version to context for use in templates
@@ -501,20 +448,15 @@ class FirstrunView(LatestFxView):
 
     def get_template_names(self):
         version = self.kwargs.get('version') or ''
-        locale = l10n_utils.get_locale(self.request)
 
         if show_devbrowser_firstrun_or_whatsnew(version):
             template = 'firefox/dev-firstrun.html'
         elif show_40_firstrun(version):
-            template = 'firefox/australis/fx40/firstrun.html'
+            template = 'firefox/firstrun/firstrun.html'
         elif show_38_0_5_firstrun_or_whatsnew(version):
             template = 'firefox/australis/fx38_0_5/firstrun.html'
-        elif show_36_firstrun(version):
-            template = 'firefox/australis/fx36/firstrun-tour.html'
-        elif show_search_firstrun(version) and locale == 'en-US':
-            template = 'firefox/australis/firstrun-34-tour.html'
         else:
-            template = 'firefox/australis/firstrun-tour.html'
+            template = 'firefox/australis/firstrun.html'
 
         # return a list to conform with original intention
         return [template]
@@ -557,8 +499,8 @@ class WhatsnewView(LatestFxView):
 
         if show_devbrowser_firstrun_or_whatsnew(version):
             template = 'firefox/dev-whatsnew.html'
-        elif version.startswith('42.'):
-            template = 'firefox/whatsnew_42/variant-a.html'
+        elif show_42_whatsnew(version):
+            template = 'firefox/whatsnew_42/whatsnew.html'
         elif show_38_0_5_firstrun_or_whatsnew(version):
             has_video = LOCALE_SPRING_CAMPAIGN_VIDEOS.get(locale, False)
             has_pocket = locale in self.pocket_locales
@@ -569,16 +511,9 @@ class WhatsnewView(LatestFxView):
             elif has_pocket:
                 template = 'firefox/whatsnew_38/whatsnew-pocket.html'
             else:
-                template = 'firefox/australis/fx36/whatsnew-no-tour.html'
-        elif version.startswith('37.'):
-            template = 'firefox/whatsnew-fx37.html'
-        elif version.startswith('36.'):
-            if show_36_whatsnew_tour(oldversion):
-                template = 'firefox/australis/fx36/whatsnew-tour.html'
-            else:
-                template = 'firefox/australis/fx36/whatsnew-no-tour.html'
+                template = 'firefox/australis/whatsnew.html'
         else:
-            template = 'firefox/australis/whatsnew-no-tour.html'
+            template = 'firefox/australis/whatsnew.html'
 
         # return a list to conform with original intention
         return [template]
@@ -597,16 +532,13 @@ class TourView(LatestFxView):
 
     def get_template_names(self):
         version = self.kwargs.get('version') or ''
-        locale = l10n_utils.get_locale(self.request)
 
         if show_devbrowser_firstrun_or_whatsnew(version):
             template = 'firefox/dev-firstrun.html'
-        elif show_36_firstrun(version):
-            template = 'firefox/australis/fx36/help-menu-36-tour.html'
-        elif show_search_firstrun(version) and locale == 'en-US':
-            template = 'firefox/australis/help-menu-34-tour.html'
+        elif show_36_tour(version):
+            template = 'firefox/australis/fx36/tour.html'
         else:
-            template = 'firefox/australis/help-menu-tour.html'
+            template = 'firefox/australis/firstrun.html'
 
         # return a list to conform with original intention
         return [template]
@@ -643,8 +575,16 @@ class HelloStartView(LatestFxView):
 
 class FeedbackView(TemplateView):
 
+    donate_url = ('https://donate.mozilla.org/'
+       '?ref=EOYFR2015&utm_campaign=EOYFR2015'
+       '&utm_source=Heartbeat_survey&utm_medium=referral'
+       '&utm_content=Heartbeat_{0}stars')
+
+    def get_score(self):
+        return self.request.GET.get('score', 0)
+
     def get_template_names(self):
-        score = self.request.GET.get('score', 0)
+        score = self.get_score()
         if score > '3':
             template = 'firefox/feedback/happy.html'
         else:
@@ -652,33 +592,39 @@ class FeedbackView(TemplateView):
 
         return [template]
 
+    def get_context_data(self, **kwargs):
+        context = super(FeedbackView, self).get_context_data(**kwargs)
+        score = self.get_score()
 
-def android(request):
-    # check for variant in querystring for send-to-device testing
-    variant = request.GET.get('v', '')
+        if score in ['3', '4', '5']:
+            context['donate_stars_url'] = self.donate_url.format(score)
 
-    # ensure variant is one of 3 accepted values
-    if (variant not in ['a', 'b', 'c']):
-        variant = ''
-
-    return l10n_utils.render(request, 'firefox/android/index.html',
-        {'variant': variant})
+        return context
 
 
 class Win10Welcome(l10n_utils.LangFilesMixin, TemplateView):
 
     def get_template_names(self):
         # check for variant in querystring for multi-variant testing.
-        variant = self.request.GET.get('v', '')
+        v = self.request.GET.get('v', '')
         template = 'firefox/win10-welcome.html'
 
         # ensure variant is one of 4 accepted values and locale is en-US only.
-        # now on round 2 of testing, hence "-2" in template name
-        if (variant in ['1', '2', '3', '4'] and self.request.locale == 'en-US'):
-            template = 'firefox/win10_variants/variant-2-' + variant + '.html'
+        # now on round 3 of testing, hence "-3" in template name
+        if (v in map(str, range(1, 11)) and self.request.locale == 'en-US'):
+            template = 'firefox/win10_variants/variant-3-' + v + '.html'
 
         return [template]
 
 
 class TrackingProtectionTourView(l10n_utils.LangFilesMixin, TemplateView):
     template_name = 'firefox/tracking-protection-tour.html'
+
+
+@xframe_allow
+def new(request):
+    # Remove legacy query parameters (Bug 1236791)
+    if request.GET.get('product', None) or request.GET.get('os', None):
+        return HttpResponsePermanentRedirect(reverse('firefox.new'))
+
+    return l10n_utils.render(request, 'firefox/new.html')

@@ -241,4 +241,41 @@ redirectpatterns = (
 
     # bug 960543
     redirect(r'^firefox/(?P<vers>[23])\.0/eula', '/legal/eula/firefox-{vers}/'),
+
+    # bug 1224060
+    redirect(r'^ja/firefox/ios/(?P<vers>[0-9]+(\.[0-9]+)*)/(?P<file>releasenotes|system-requirements)',
+             'http://www.mozilla.jp/firefox/ios/{vers}/{file}/', locale_prefix=False),
+
+    # bug 1150713
+    redirect(r'^firefox/sms(?:/.*)?$', '/firefox/products/'),
+
+    # Redirects for SeaMonkey project website, now living at seamonkey-project.org
+    redirect(r'^projects/seamonkey/$', 'http://www.seamonkey-project.org/'),
+    redirect(r'^projects/seamonkey/artwork\.html$',
+             'http://www.seamonkey-project.org/dev/artwork'),
+    redirect(r'^projects/seamonkey/community\.html$',
+             'http://www.seamonkey-project.org/community'),
+    redirect(r'^projects/seamonkey/get-involved\.html$',
+             'http://www.seamonkey-project.org/dev/get-involved'),
+    redirect(r'^projects/seamonkey/index\.html$', 'http://www.seamonkey-project.org/'),
+    redirect(r'^projects/seamonkey/news\.html$', 'http://www.seamonkey-project.org/news'),
+    redirect(r'^projects/seamonkey/project-areas\.html$',
+             'http://www.seamonkey-project.org/dev/project-areas'),
+    redirect(r'^projects/seamonkey/releases/$', 'http://www.seamonkey-project.org/releases/'),
+    redirect(r'^projects/seamonkey/releases/index\.html$',
+             'http://www.seamonkey-project.org/releases/'),
+    redirect(r'^projects/seamonkey/review-and-flags\.html$',
+             'http://www.seamonkey-project.org/dev/review-and-flags'),
+    redirect(r'^projects/seamonkey/releases/(?P<vers>1\..*)\.html$',
+             'http://www.seamonkey-project.org/releases/{vers}'),
+    redirect(r'^projects/seamonkey/releases/seamonkey(?P<x>.*)/index.html$',
+             'http://www.seamonkey-project.org/releases/seamonkey{x}/'),
+    redirect(r'^projects/seamonkey/releases/seamonkey(?P<x>.*/.*).html$',
+             'http://www.seamonkey-project.org/releases/seamonkey{x}'),
+    redirect(r'^projects/seamonkey/releases/updates/(?P<x>.*)$',
+             'http://www.seamonkey-project.org/releases/updates/{x}'),
+    redirect(r'^projects/seamonkey/start/$', 'http://www.seamonkey-project.org/start/'),
+
+    # Bug 638948 redirect beta privacy policy link
+    redirect(r'^firefox/beta/feedbackprivacypolicy/?$', '/privacy/firefox/'),
 )

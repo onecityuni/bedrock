@@ -612,7 +612,7 @@ html[lang^='en'] {
 .download-button .os_linux,
 .download-button .os_linux64,
 // Uncomment this to enable the win64 download buttons:
-// .win7up.x86.x64 .download-button-aurora .os_win,
+// .win7up.x86.x64 .download-button .os_win,
 .android .download-button-desktop,
 .windows.arm .download-button .os_win,
 .linux.arm .download-button .os_linux,
@@ -627,7 +627,7 @@ html[lang^='en'] {
 }
 
 // Uncomment this to enable the win64 download buttons:
-// .win7up.x86.x64 .download-button-aurora .os_win64,
+// .win7up.x86.x64 .download-button .os_win64,
 .linux .download-button .os_linux,
 .linux.x86.x64 .download-button .os_linux64,
 .windows .download-button .os_win,
@@ -637,6 +637,8 @@ html[lang^='en'] {
 .android .download-button-desktop .download-list,
 .android .download-button-desktop small.os_win,
 .download-button-ios .os_ios,
+.ios .download-button .ios-download,
+.ios .download-button-desktop .download-list,
 .no-js .download-button-android .download-list,
 .other .download-button-android .download-list,
 .other .download-button small.os_win {
@@ -651,18 +653,6 @@ html[lang^='en'] {
     max-width: 250px;
 }
 
-// Declaring these funky rules for iOS due to the
-// waffle situation and needing to support both states.
-// This can be cleaned up post-launch (bug 1217929)
-.ios .download-button.ios-active .ios-download {
-    display: none !important;
-}
-
-.ios .download-button .ios-download,
-.ios .download-button.ios-active .os_ios,
-.ios .download-button-desktop.ios-active .download-list {
-    display: block !important;
-}
 
 // Small print
 
@@ -692,7 +682,8 @@ html[lang^='en'] {
 
 .other .download-button,
 .android .download-button-desktop,
-.ios .download-button-desktop {
+.ios .download-button-desktop,
+.no-js .download-button {
     .unrecognized-download {
         display: block;
     }

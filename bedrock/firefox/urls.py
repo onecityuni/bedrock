@@ -3,8 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from django.conf.urls import url
 
-from commonware.response.decorators import xframe_allow
-
 from bedrock.redirects.util import redirect
 from bedrock.mozorg.util import page
 
@@ -33,6 +31,7 @@ urlpatterns = (
     redirect(r'^firefox/$', 'firefox.new', name='firefox', locale_prefix=False),
     url(r'^firefox/(?:%s/)?all/$' % channel_re,
         views.all_downloads, name='firefox.all'),
+    page('firefox/accounts', 'firefox/accounts.html'),
     page('firefox/channel', 'firefox/channel.html'),
     redirect('^firefox/channel/android/$', 'firefox.channel', locale_prefix=False),
     url(r'^firefox/choose/$', views.choose, name='firefox.choose'),
@@ -45,7 +44,7 @@ urlpatterns = (
     page('firefox/geolocation', 'firefox/geolocation.html'),
     url(r'^firefox/hello/$', views.hello, name='firefox.hello'),
     page('firefox/interest-dashboard', 'firefox/interest-dashboard.html'),
-    url(r'^firefox/android/$', views.android, name='firefox.android.index'),
+    page('firefox/android', 'firefox/android/index.html'),
     page('firefox/android/all', 'firefox/android/all.html'),
     page('firefox/android/faq', 'firefox/android/faq.html'),
     page('firefox/ios', 'firefox/ios.html'),
@@ -55,12 +54,10 @@ urlpatterns = (
     page('firefox/private-browsing', 'firefox/private-browsing.html'),
     url('^firefox/send-to-device-post/$', views.send_to_device_ajax,
         name='firefox.send-to-device-post'),
-    url('^firefox/sms/$', views.sms_send, name='firefox.sms'),
-    page('firefox/sms/sent', 'firefox/android/sms-thankyou.html'),
     page('firefox/sync', 'firefox/sync.html'),
     page('firefox/tiles', 'firefox/tiles.html'),
     page('firefox/unsupported-systems', 'firefox/unsupported-systems.html'),
-    page('firefox/new', 'firefox/new.html', decorators=xframe_allow),
+    url(r'^firefox/new/$', views.new, name='firefox.new'),
     page('firefox/organizations/faq', 'firefox/organizations/faq.html'),
     page('firefox/organizations', 'firefox/organizations/organizations.html'),
     page('firefox/nightly/firstrun', 'firefox/nightly_firstrun.html'),

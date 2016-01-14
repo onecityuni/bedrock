@@ -23,14 +23,6 @@ urlpatterns = (
     page('credits/faq', 'mozorg/credits-faq.html'),
     url('^about/partnerships/$', views.partnerships, name='mozorg.partnerships'),
     page('about/partnerships/distribution', 'mozorg/partnerships-distribution.html'),
-    page('about/partnerships/contentservices', 'mozorg/contentservices/index.html'),
-    page('about/partnerships/contentservices/about', 'mozorg/contentservices/about.html'),
-    page('about/partnerships/contentservices/faq', 'mozorg/contentservices/faq.html'),
-    page('about/partnerships/contentservices/dmexco', 'mozorg/contentservices/dmexco.html'),
-    url('^about/partnerships/contentservices/start/$', views.content_services_start,
-        name='mozorg.contentservices.start'),
-    page('about/partnerships/contentservices/tiles', 'mozorg/contentservices/tiles.html'),
-    page('about/partnerships/contentservices/user-respect', 'mozorg/contentservices/user-respect.html'),
     page('about/history', 'mozorg/about/history.html'),
     page('about/history/details', 'mozorg/about/history-details.html'),
     page('about/mozilla-based', 'mozorg/projects/mozilla-based.html'),
@@ -40,7 +32,6 @@ urlpatterns = (
     # Bug 981063, catch all for old calendar urls.
     # must be here to avoid overriding the above
     redirect(r'^projects/calendar/', 'mozorg.projects.calendar', locale_prefix=False),
-    page('button', 'mozorg/button.html'),
     page('mission', 'mozorg/mission.html'),
     page('ITU', 'mozorg/itu.html'),
     page('about/powered-by', 'mozorg/powered-by.html'),
@@ -259,4 +250,14 @@ urlpatterns = (
     url(r'^robots.txt$', views.Robots.as_view(), name='robots.txt'),
     url(r'^contributor-data/(?P<source_name>[a-z]{2,20})\.json$', views.mozid_data_view,
         name='mozorg.contributor-data'),
+
+    # namespaces
+    url(r'^2004/em-rdf$', views.namespaces, {'namespace': 'em-rdf'}),
+    url(r'^2005/app-update$', views.namespaces, {'namespace': 'update'}),
+    url(r'^2006/addons-blocklist$', views.namespaces, {'namespace': 'addons-bl'}),
+    url(r'^2006/browser/search/$', views.namespaces, {'namespace': 'mozsearch'}),
+    url(r'^keymaster/gatekeeper/there\.is\.only\.xul$', views.namespaces, {'namespace': 'xul'}),
+    url(r'^microsummaries/0\.1$', views.namespaces, {'namespace': 'microsummaries'}),
+    url(r'^projects/xforms/2005/type$', views.namespaces, {'namespace': 'xforms-type'}),
+    url(r'^xbl$', views.namespaces, {'namespace': 'xbl'}),
 )

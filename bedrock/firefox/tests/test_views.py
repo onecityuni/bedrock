@@ -107,38 +107,16 @@ class TestSendToDeviceView(TestCase):
         ok_('email' in resp_data['errors'])
         ok_(not self.mock_subscribe.called)
 
-    # send to device testing tests (bug 1198516)
-    def test_variant_android_modal_email(self):
-        resp_data = self._request({
-            'platform': 'android',
-            'phone-or-email': 'dude@example.com',
-            'android-send-to-device-test': 'android-test-modal',
-        })
-        ok_(resp_data['success'])
-        self.mock_subscribe.assert_called_with('dude@example.com',
-                                                views.EMAIL_MESSAGES['android-test-modal'],
-                                                source_url=None,
-                                                lang='en-US')
-
-    def test_variant_android_modal_sms(self):
-        resp_data = self._request({
-            'platform': 'android',
-            'phone-or-email': '5558675309',
-            'android-send-to-device-test': 'android-test-modal',
-        })
-        ok_(resp_data['success'])
-        self.mock_send_sms.assert_called_with('15558675309',
-                                                views.SMS_MESSAGES['android-test-modal'])
-
+    # /firefox/android/ embedded widget (bug 1221328)
     def test_variant_android_embedded_email(self):
         resp_data = self._request({
             'platform': 'android',
             'phone-or-email': 'dude@example.com',
-            'android-send-to-device-test': 'android-test-embed',
+            'send-to-device-basket-id': 'android-embed',
         })
         ok_(resp_data['success'])
         self.mock_subscribe.assert_called_with('dude@example.com',
-                                                views.EMAIL_MESSAGES['android-test-embed'],
+                                                views.EMAIL_MESSAGES['android-embed'],
                                                 source_url=None,
                                                 lang='en-US')
 
@@ -146,11 +124,11 @@ class TestSendToDeviceView(TestCase):
         resp_data = self._request({
             'platform': 'android',
             'phone-or-email': '5558675309',
-            'android-send-to-device-test': 'android-test-embed',
+            'send-to-device-basket-id': 'android-embed',
         })
         ok_(resp_data['success'])
         self.mock_send_sms.assert_called_with('15558675309',
-                                                views.SMS_MESSAGES['android-test-embed'])
+                                                views.SMS_MESSAGES['android-embed'])
 
     # an invalid value for 'android-send-to-device-test' should cause email message
     # to revert back to specified platform
@@ -158,7 +136,7 @@ class TestSendToDeviceView(TestCase):
         resp_data = self._request({
             'platform': 'android',
             'phone-or-email': 'dude@example.com',
-            'android-send-to-device-test': 'a-real-reactionary',  # bad value!
+            'send-to-device-basket-id': 'a-real-reactionary',  # bad value!
         })
         ok_(resp_data['success'])
         self.mock_subscribe.assert_called_with('dude@example.com',
@@ -180,71 +158,6 @@ class TestFirefoxNew(TestCase):
         ok_('x-frame-options' not in resp)
 
 
-@patch('bedrock.firefox.views.basket.send_sms')
-class TestSMSView(TestCase):
-    def setUp(self):
-        self.rf = RequestFactory()
-
-    def test_normal_post_success(self, sms_mock):
-        """Should send sms and return a redirect."""
-        req = self.rf.post('/', {'number': '5558675309'})
-        resp = views.sms_send(req)
-        sms_mock.assert_called_with('15558675309', 'SMS_Android', False)
-        self.assertEqual(resp.status_code, 302)
-
-    def test_ajax_post_success(self, sms_mock):
-        """Should send sms and return a JSON response."""
-        req = self.rf.post('/', {'number': '5558675309'},
-                           HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        resp = views.sms_send(req)
-        sms_mock.assert_called_with('15558675309', 'SMS_Android', False)
-        self.assertEqual(resp.status_code, 200)
-        resp_data = json.loads(resp.content)
-        self.assertEqual(resp_data, {'success': True})
-
-    def test_normal_post_error(self, sms_mock):
-        """Should not send sms and should return the form with error message."""
-        req = self.rf.post('/', {'number': '8675309'})
-        resp = views.sms_send(req)
-        self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, u'Sorry. This number isn\'t valid.')
-        self.assertFalse(sms_mock.called)
-
-    def test_ajax_post_error(self, sms_mock):
-        """Should not send sms and should return a JSON response."""
-        req = self.rf.post('/', {'number': '8675309'},
-                           HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        resp = views.sms_send(req)
-        self.assertFalse(sms_mock.called)
-        self.assertEqual(resp.status_code, 200)
-        resp_data = json.loads(resp.content)
-        self.assertFalse(resp_data['success'])
-        self.assertIn(u'Sorry. This number isn\'t valid.', resp_data['error'])
-
-    def test_normal_basket_error(self, sms_mock):
-        """Should not send sms and should return the form with error message."""
-        sms_mock.side_effect = views.basket.BasketException
-        req = self.rf.post('/', {'number': '5558675309'})
-        resp = views.sms_send(req)
-        sms_mock.assert_called_with('15558675309', 'SMS_Android', False)
-        self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, u'An error occurred in our system. Please try again later.')
-
-    def test_ajax_basket_error(self, sms_mock):
-        """Should not send sms and should return a JSON response."""
-        sms_mock.side_effect = views.basket.BasketException
-        req = self.rf.post('/', {'number': '5558675309'},
-                           HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        resp = views.sms_send(req)
-        sms_mock.assert_called_with('15558675309', 'SMS_Android', False)
-        self.assertEqual(resp.status_code, 200)
-        resp_data = json.loads(resp.content)
-        self.assertEqual(resp_data, {
-            'success': False,
-            'error': u'An error occurred in our system. Please try again later.',
-        })
-
-
 class TestWin10WelcomeView(TestCase):
     def test_get_template_names_default(self):
         view = views.Win10Welcome()
@@ -252,29 +165,65 @@ class TestWin10WelcomeView(TestCase):
         view.request.locale = 'en-US'
         eq_(view.get_template_names(), ['firefox/win10-welcome.html'])
 
-    def test_get_template_names_variant_1(self):
+    def test_get_template_names_v1(self):
         view = views.Win10Welcome()
         view.request = RequestFactory().get('/?v=1')
         view.request.locale = 'en-US'
-        eq_(view.get_template_names(), ['firefox/win10_variants/variant-2-1.html'])
+        eq_(view.get_template_names(), ['firefox/win10_variants/variant-3-1.html'])
 
-    def test_get_template_names_variant_2(self):
+    def test_get_template_names_v2(self):
         view = views.Win10Welcome()
         view.request = RequestFactory().get('/?v=2')
         view.request.locale = 'en-US'
-        eq_(view.get_template_names(), ['firefox/win10_variants/variant-2-2.html'])
+        eq_(view.get_template_names(), ['firefox/win10_variants/variant-3-2.html'])
 
-    def test_get_template_names_variant_3(self):
+    def test_get_template_names_v3(self):
         view = views.Win10Welcome()
         view.request = RequestFactory().get('/?v=3')
         view.request.locale = 'en-US'
-        eq_(view.get_template_names(), ['firefox/win10_variants/variant-2-3.html'])
+        eq_(view.get_template_names(), ['firefox/win10_variants/variant-3-3.html'])
 
-    def test_get_template_names_variant_4(self):
+    def test_get_template_names_v4(self):
         view = views.Win10Welcome()
         view.request = RequestFactory().get('/?v=4')
         view.request.locale = 'en-US'
-        eq_(view.get_template_names(), ['firefox/win10_variants/variant-2-4.html'])
+        eq_(view.get_template_names(), ['firefox/win10_variants/variant-3-4.html'])
+
+    def test_get_template_names_v5(self):
+        view = views.Win10Welcome()
+        view.request = RequestFactory().get('/?v=5')
+        view.request.locale = 'en-US'
+        eq_(view.get_template_names(), ['firefox/win10_variants/variant-3-5.html'])
+
+    def test_get_template_names_v6(self):
+        view = views.Win10Welcome()
+        view.request = RequestFactory().get('/?v=6')
+        view.request.locale = 'en-US'
+        eq_(view.get_template_names(), ['firefox/win10_variants/variant-3-6.html'])
+
+    def test_get_template_names_v7(self):
+        view = views.Win10Welcome()
+        view.request = RequestFactory().get('/?v=7')
+        view.request.locale = 'en-US'
+        eq_(view.get_template_names(), ['firefox/win10_variants/variant-3-7.html'])
+
+    def test_get_template_names_v8(self):
+        view = views.Win10Welcome()
+        view.request = RequestFactory().get('/?v=8')
+        view.request.locale = 'en-US'
+        eq_(view.get_template_names(), ['firefox/win10_variants/variant-3-8.html'])
+
+    def test_get_template_names_v9(self):
+        view = views.Win10Welcome()
+        view.request = RequestFactory().get('/?v=9')
+        view.request.locale = 'en-US'
+        eq_(view.get_template_names(), ['firefox/win10_variants/variant-3-9.html'])
+
+    def test_get_template_names_v10(self):
+        view = views.Win10Welcome()
+        view.request = RequestFactory().get('/?v=10')
+        view.request.locale = 'en-US'
+        eq_(view.get_template_names(), ['firefox/win10_variants/variant-3-10.html'])
 
     def test_get_template_names_non_en(self):
         view = views.Win10Welcome()
@@ -282,7 +231,13 @@ class TestWin10WelcomeView(TestCase):
         view.request.locale = 'de'
         eq_(view.get_template_names(), ['firefox/win10-welcome.html'])
 
-    def test_get_template_names_invalid(self):
+    def test_get_template_names_invalid_number(self):
+        view = views.Win10Welcome()
+        view.request = RequestFactory().get('/?v=11')
+        view.request.locale = 'en-US'
+        eq_(view.get_template_names(), ['firefox/win10-welcome.html'])
+
+    def test_get_template_names_invalid_string(self):
         view = views.Win10Welcome()
         view.request = RequestFactory().get('/?v=dude')
         view.request.locale = 'en-US'
@@ -304,6 +259,28 @@ class TestFeedbackView(TestCase):
         view = views.FeedbackView()
         view.request = RequestFactory().get('/?score=1')
         eq_(view.get_template_names(), ['firefox/feedback/unhappy.html'])
+
+    def test_get_context_data_three_stars(self):
+        view = views.FeedbackView()
+        view.request = RequestFactory().get('/?score=3')
+
+        ctx = view.get_context_data()
+        self.assertTrue(ctx['donate_stars_url'].endswith('Heartbeat_3stars'))
+
+    def test_get_context_data_five_stars(self):
+        view = views.FeedbackView()
+        view.request = RequestFactory().get('/?score=5')
+
+        ctx = view.get_context_data()
+        self.assertTrue(ctx['donate_stars_url'].endswith('Heartbeat_5stars'))
+
+    def test_get_context_data_one_star(self):
+        """donate_stars_url should be undefined"""
+        view = views.FeedbackView()
+        view.request = RequestFactory().get('/?score=1')
+
+        ctx = view.get_context_data()
+        self.assertFalse('donate_stars_url' in ctx)
 
 
 @override_settings(FIREFOX_OS_COUNTRY_VERSIONS=FXOS_COUNTRIES)

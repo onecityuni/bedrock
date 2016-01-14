@@ -29,8 +29,7 @@ from bedrock.mozorg.credits import CreditsFile
 from bedrock.mozorg.decorators import cache_control_expires
 from bedrock.mozorg.forms import (ContributeForm, ContributeTasksForm,
                                   ContributeStudentAmbassadorForm,
-                                  WebToLeadForm, ContributeSignupForm,
-                                  ContentServicesForm)
+                                  WebToLeadForm, ContributeSignupForm)
 from bedrock.mozorg.forums import ForumsFile
 from bedrock.mozorg.models import ContributorActivity, TwitterCache
 from bedrock.mozorg.util import hide_contrib_form, HttpResponseJSON
@@ -370,92 +369,6 @@ def partnerships(request):
     return process_partnership_form(request, 'mozorg/partnerships.html', 'mozorg.partnerships')
 
 
-def process_content_services_form(request, template, success_url_name, template_vars=None, form_kwargs=None):
-    template_vars = template_vars or {}
-    form_kwargs = form_kwargs or {}
-
-    if request.method == 'POST':
-        form = ContentServicesForm(data=request.POST, **form_kwargs)
-
-        msg = 'Form invalid'
-        stat = 400
-        success = False
-
-        if form.is_valid():
-            data = form.cleaned_data.copy()
-
-            honeypot = data.pop('office_fax')
-
-            if honeypot:
-                # don't let on there was a problem
-                msg = 'ok'
-                stat = 200
-            else:
-                # rename custom Salesforce fields to their real GUID name
-                data['00NU00000053D4G'] = data.pop('interested_countries')
-                data['00NU00000053D4L'] = data.pop('interested_languages')
-                data['00NU00000053D4a'] = data.pop('campaign_type')
-                data['00NU0000004ELEK'] = data.pop('mobile')
-                data['oid'] = '00DU0000000IrgO'
-
-                if data['country'] != 'us':
-                    data['state'] = data.pop('province')
-
-                data['lead_source'] = form_kwargs.get(
-                    'lead_source',
-                    'www.mozilla.org/about/partnerships/contentservices/')
-                # As we're doing the Salesforce POST in the background here,
-                # `retURL` is never visited/seen by the user. I believe it
-                # is required by Salesforce though, so it should hang around
-                # as a placeholder (with a valid URL, just in case).
-                data['retURL'] = ('http://www.mozilla.org/en-US/'
-                                  'about/partnerships/'
-                                  'contentservices/start?success=1')
-
-                r = requests.post('https://www.salesforce.com/servlet/'
-                                  'servlet.WebToLead?encoding=UTF-8', data)
-                msg = requests.status_codes._codes.get(r.status_code, ['error'])[0]
-                stat = r.status_code
-
-                success = True
-
-        if request.is_ajax():
-            # ensure no unescaped values sent back.
-            form_errors = {fn: [escape(msg) for msg in msgs] for fn, msgs
-                           in form.errors.iteritems()}
-            return HttpResponseJSON({'msg': msg, 'errors': form_errors}, status=stat)
-        # non-AJAX POST
-        else:
-            # if form is not valid, render template to retain form data/error messages
-            if not success:
-                template_vars.update(csrf(request))
-                template_vars['form'] = form
-                template_vars['form_success'] = success
-
-                return l10n_utils.render(request, template, template_vars)
-            # if form is valid, redirect to avoid refresh double post possibility
-            else:
-                return HttpResponseRedirect("%s?success" % (reverse(success_url_name)))
-
-    # no form POST - build form, add CSRF, & render template
-    else:
-        # without auto_id set, all id's get prefixed with 'id_'
-        form = ContentServicesForm(auto_id='%s', **form_kwargs)
-
-        template_vars.update(csrf(request))
-        template_vars['form'] = form
-        template_vars['form_success'] = True if ('success' in request.GET) else False
-
-        return l10n_utils.render(request, template, template_vars)
-
-
-@csrf_protect
-def content_services_start(request):
-    return process_content_services_form(request,
-                                         'mozorg/contentservices/start.html',
-                                         'mozorg.contentservices.start')
-
-
 def plugincheck(request, template='mozorg/plugincheck.html'):
     """
     Renders the plugncheck template.
@@ -547,9 +460,61 @@ def home_tweets(locale):
 
 def home(request):
     locale = l10n_utils.get_locale(request)
+
     return l10n_utils.render(
         request, 'mozorg/home/home.html', {
             'has_contribute': lang_file_is_active('mozorg/contribute'),
             'tweets': home_tweets(locale),
             'mobilizer_link': settings.MOBILIZER_LOCALE_LINK.get(
                 locale, settings.MOBILIZER_LOCALE_LINK['en-US'])})
+
+
+NAMESPACES = {
+    'addons-bl': {
+        'namespace': 'http://www.mozilla.org/2006/addons-blocklist',
+        'standard': 'Add-ons Blocklist',
+        'docs': 'https://wiki.mozilla.org/Extension_Blocklisting:Code_Design',
+    },
+    'em-rdf': {
+        'namespace': 'http://www.mozilla.org/2004/em-rdf',
+        'standard': 'Extension Manifest',
+        'docs': 'https://developer.mozilla.org/en/Install_Manifests',
+    },
+    'microsummaries': {
+        'namespace': 'http://www.mozilla.org/microsummaries/0.1',
+        'standard': 'Microsummaries',
+        'docs': 'https://developer.mozilla.org/en/Microsummary_XML_grammar_reference',
+    },
+    'mozsearch': {
+        'namespace': 'http://www.mozilla.org/2006/browser/search/',
+        'standard': 'MozSearch plugin format',
+        'docs': 'https://developer.mozilla.org/en/Creating_MozSearch_plugins',
+    },
+    'update': {
+        'namespace': 'http://www.mozilla.org/2005/app-update',
+        'standard': 'Software Update Service',
+        'docs': 'https://wiki.mozilla.org/Software_Update:Testing',
+    },
+    'xbl': {
+        'namespace': 'http://www.mozilla.org/xbl',
+        'standard': 'XML Binding Language (XBL)',
+        'docs': 'https://developer.mozilla.org/en/XBL',
+    },
+    'xforms-type': {
+        'namespace': 'http://www.mozilla.org/projects/xforms/2005/type',
+        'standard': 'XForms mozType extension',
+        'docs': 'https://developer.mozilla.org/en/XForms/Custom_Controls',
+    },
+    'xul': {
+        'namespace': 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
+        'standard': 'XML User Interface Language (XUL)',
+        'docs': 'https://developer.mozilla.org/en/XUL',
+    },
+}
+
+
+def namespaces(request, namespace):
+    context = NAMESPACES[namespace]
+    context['slug'] = namespace
+    template = 'mozorg/namespaces.html'
+    return django_render(request, template, context)

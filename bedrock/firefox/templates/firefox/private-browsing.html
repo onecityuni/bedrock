@@ -6,6 +6,7 @@
 
 {% extends "firefox/base-resp.html" %}
 
+{% block page_image %}{{ static('img/firefox/private-browsing/private-browsing-meta.png') }}{% endblock %}
 {% block page_title %}{{ _('Firefox Web browser — Private Browsing with Tracking Protection — Mozilla') }}{% endblock %}
 {% block page_desc %}{{ _('Get more protection and the most privacy, only from Firefox. No other browser gives you so much control over your digital footprint.')}}{% endblock %}
 {% block body_id %}firefox-private-browsing{% endblock %}
@@ -43,7 +44,7 @@
               </a>
             </div>
             <div class="ios-download-button">
-              <a href="{{ settings.APPLE_APPSTORE_FIREFOX_LINK }}&amp;ct=mozorg-ios_page-appstore-button">
+              <a href="{{ firefox_ios_url('mozorg-ios_page-appstore-button') }}">
                 <img src="{{ l10n_img('firefox/ios/btn-app-store.svg') }}" alt="{{ _('Download on the App Store') }}">
               </a>
             </div>
@@ -141,7 +142,7 @@
             </a>
           </div>
           <div class="ios-download-button">
-            <a href="{{ settings.APPLE_APPSTORE_FIREFOX_LINK }}&amp;ct=mozorg-ios_page-appstore-button">
+            <a href="{{ firefox_ios_url('mozorg-ios_page-appstore-button') }}">
               <img src="{{ l10n_img('firefox/ios/btn-app-store.svg') }}" alt="{{ _('Download on the App Store') }}">
             </a>
           </div>

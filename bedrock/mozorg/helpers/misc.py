@@ -14,6 +14,7 @@ import jingo
 import jinja2
 from bedrock.base.urlresolvers import reverse
 from bedrock.base.helpers import static
+from bedrock.firefox.firefox_details import firefox_ios
 
 
 ALL_FX_PLATFORMS = ('windows', 'linux', 'mac', 'android', 'ios')
@@ -349,11 +350,7 @@ def press_blog_url(ctx):
 @jingo.register.function
 @jinja2.contextfunction
 def donate_url(ctx, source=''):
-    """Output a link to the donation page taking locales into account.
-
-    Uses the locale from the current request. Checks to see if we have
-    a donation page that match this locale, returns the localized page
-    url or falls back to the US page url if not.
+    """Output a donation link to the donation page formatted using settings.DONATE_PARAMS
 
     Examples
     ========
@@ -365,33 +362,25 @@ def donate_url(ctx, source=''):
 
     For en-US this would output:
 
-        https://sendto.mozilla.org/page/contribute/EOYFR2013-tabzilla
+        https://donate.mozilla.org/en-US/?presets=100,50,25,15&amount=50&ref=EOYFR2015&utm_campaign=EOYFR2015&utm_source=mozilla.org&utm_medium=referral&utm_content=footer&currency=usd
 
     For de this would output:
 
-        https://sendto.mozilla.org/page/contribute/EOYFR2013-webDE
+        https://donate.mozilla.org/de/?presets=100,50,25,15&amount=50&ref=EOYFR2015&utm_campaign=EOYFR2015&utm_source=mozilla.org&utm_medium=referral&utm_content=footer&currency=eur
 
-    For fr this would output:
+    For a locale not defined in settings.DONATE this would output:
 
-        https://sendto.mozilla.org/page/contribute/EOYFR2013-webFR
-
-    For pt-BR this would output:
-
-        https://sendto.mozilla.org/page/contribute/EOYFR2013-webPTBR
+        https://donate.mozilla.org/ca/?presets=100,50,25,15&amount=50&ref=EOYFR2015&utm_campaign=EOYFR2015&utm_source=mozilla.org&utm_medium=referral&utm_content=footer&currency=usd
 
     """
     locale = getattr(ctx['request'], 'locale', 'en-US')
-    if locale not in settings.DONATE_LOCALE_LINK:
-        if 'default' in settings.DONATE_LOCALE_LINK:
-            locale = 'default'
-        else:
-            locale = 'en-US'
 
-        # The source of the new donation URL is different from the old one,
-        # so replace it if needed (Bug 1100548)
-        source = source.replace('mozillaorg', 'mozillaorg_default')
+    donate_url_params = settings.DONATE_PARAMS.get(
+        locale, settings.DONATE_PARAMS['en-US'])
 
-    return settings.DONATE_LOCALE_LINK[locale].format(source=source)
+    return settings.DONATE_LINK.format(locale=locale, presets=donate_url_params['presets'],
+        default=donate_url_params['default'], source=source,
+        currency=donate_url_params['currency'])
 
 
 @jingo.register.function
@@ -472,6 +461,49 @@ def releasenotes_url(release):
         return reverse('firefox.ios.releasenotes', args=(release.version, prefix))
     else:
         return reverse('firefox.desktop.releasenotes', args=(release.version, prefix))
+
+
+@jingo.register.function
+@jinja2.contextfunction
+def firefox_ios_url(ctx, ct_param=None):
+    """
+    Output a link to the Firefox for iOS download page on the Apple App Store
+    taking locales into account.
+
+    Use the locale from the current request. Check if the locale matches one of
+    the Store's supported countries, return the localized page's URL or fall
+    back to the default (English) page if not.
+
+    The optional ct_param is a campaign value for the app analytics.
+
+    Examples
+    ========
+
+    In Template
+    -----------
+
+        {{ firefox_ios_url() }}
+
+    For en-US this would output:
+
+        https://itunes.apple.com/us/app/apple-store/id989804926?pt=373246&amp;mt=8
+
+    For es-ES this would output:
+
+        https://itunes.apple.com/es/app/apple-store/id989804926?pt=373246&amp;mt=8
+
+    For ja this would output:
+
+        https://itunes.apple.com/jp/app/apple-store/id989804926?pt=373246&amp;mt=8
+
+    """
+    locale = getattr(ctx['request'], 'locale', 'en-US')
+    link = firefox_ios.get_download_url('release', locale)
+
+    if ct_param:
+        return link + '&ct=' + ct_param
+
+    return link
 
 
 @jingo.register.filter

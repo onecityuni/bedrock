@@ -5,6 +5,8 @@
 ;(function($) {
     'use strict';
 
+    var client = window.Mozilla.Client;
+
     var $html = $(document.documentElement);
     var $downloadbar = $('#conditional-download-bar');
 
@@ -23,12 +25,12 @@
     });
 
     // Check Firefox version
-    if (isFirefox()) {
-        if (isFirefoxUpToDate()) {
-            $html.addClass('firefox-latest');
-        } else {
-            $html.addClass('firefox-old');
-        }
+    if (client.isFirefoxDesktop || client.isFirefoxAndroid) {
+        client.getFirefoxDetails(function(data) {
+            $html.addClass(data.isUpToDate ? 'firefox-latest' : 'firefox-old');
+        });
+    } else {
+        $html.addClass('nonfx');
     }
 
     // add gtm tracking attributes

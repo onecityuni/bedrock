@@ -8,7 +8,6 @@ import platform
 from os.path import abspath
 
 from django.utils.functional import lazy
-from django.utils.http import urlquote
 
 import dj_database_url
 from decouple import Csv, config
@@ -119,17 +118,17 @@ PROD_DETAILS_STORAGE = config('PROD_DETAILS_STORAGE',
 
 # Accepted locales
 PROD_LANGUAGES = ('ach', 'af', 'an', 'ar', 'as', 'ast', 'az', 'be', 'bg',
-                  'bn-BD', 'bn-IN', 'br', 'brx', 'bs', 'ca', 'cs', 'cy',
-                  'da', 'de', 'dsb', 'ee', 'el', 'en-GB', 'en-US', 'en-ZA',
-                  'eo', 'es-AR', 'es-CL', 'es-ES', 'es-MX', 'et', 'eu',
-                  'fa', 'ff', 'fi', 'fr', 'fy-NL', 'ga-IE', 'gd', 'gl',
-                  'gu-IN', 'ha', 'he', 'hi-IN', 'hr', 'hsb', 'hu',
+                  'bn-BD', 'bn-IN', 'br', 'brx', 'bs', 'ca', 'cak', 'cs',
+                  'cy', 'da', 'de', 'dsb', 'ee', 'el', 'en-GB', 'en-US',
+                  'en-ZA', 'eo', 'es-AR', 'es-CL', 'es-ES', 'es-MX', 'et',
+                  'eu', 'fa', 'ff', 'fi', 'fr', 'fy-NL', 'ga-IE', 'gd',
+                  'gl', 'gu-IN', 'ha', 'he', 'hi-IN', 'hr', 'hsb', 'hu',
                   'hy-AM', 'id', 'ig', 'is', 'it', 'ja', 'ja-JP-mac',
                   'ka', 'kk', 'km', 'kn', 'ko', 'lij', 'ln', 'lt', 'lv',
                   'mai', 'mk', 'ml', 'mr', 'ms', 'my', 'nb-NO', 'nl',
                   'nn-NO', 'oc', 'or', 'pa-IN', 'pl', 'pt-BR', 'pt-PT',
-                  'rm', 'ro', 'ru', 'sat', 'si', 'sk', 'sl', 'son', 'sq', 'sr',
-                  'sv-SE', 'sw', 'ta', 'te', 'th', 'tr', 'uk', 'ur',
+                  'rm', 'ro', 'ru', 'sat', 'si', 'sk', 'sl', 'son', 'sq',
+                  'sr', 'sv-SE', 'sw', 'ta', 'te', 'th', 'tr', 'uk', 'ur',
                   'uz', 'vi', 'wo', 'xh', 'yo', 'zh-CN', 'zh-TW', 'zu')
 
 LOCALES_PATH = ROOT_PATH / 'locale'
@@ -210,6 +209,12 @@ SUPPORTED_NONLOCALES = [
     'webmaker',
     'contributor-data',
     'healthz',
+    '2004',
+    '2005',
+    '2006',
+    'keymaster',
+    'microsummaries',
+    'xbl',
 ]
 
 ALLOWED_HOSTS = config(
@@ -307,11 +312,14 @@ DEIS_APP = config('DEIS_APP', default=None)
 DEIS_DOMAIN = config('DEIS_DOMAIN', default=None)
 ENABLE_HOSTNAME_MIDDLEWARE = config('ENABLE_HOSTNAME_MIDDLEWARE',
                                     default=bool(DEIS_APP), cast=bool)
+ENABLE_VARY_NOCACHE_MIDDLEWARE = config('ENABLE_VARY_NOCACHE_MIDDLEWARE',
+                                        default=False, cast=bool)
 
 MIDDLEWARE_CLASSES = [middleware for middleware in (
     'sslify.middleware.SSLifyMiddleware',
     'bedrock.mozorg.middleware.MozorgRequestTimingMiddleware',
     'django_statsd.middleware.GraphiteMiddleware',
+    'bedrock.mozorg.middleware.VaryNoCacheMiddleware' if ENABLE_VARY_NOCACHE_MIDDLEWARE else False,
     # must come before LocaleURLMiddleware
     'bedrock.redirects.middleware.RedirectsMiddleware',
     'bedrock.tabzilla.middleware.TabzillaLocaleURLMiddleware',
@@ -376,7 +384,6 @@ INSTALLED_APPS = (
     'bedrock.styleguide',
     'bedrock.tabzilla',
     'bedrock.teach',
-    'bedrock.facebookapps',
     'bedrock.externalfiles',
     'bedrock.security',
     'bedrock.events',
@@ -391,6 +398,24 @@ INSTALLED_APPS = (
     'lib.l10n_utils',
     'captcha',
     'rna',
+)
+
+# Must match the list at CloudFlare if the
+# VaryNoCacheMiddleware is enabled. The home
+# page is exempt by default.
+VARY_NOCACHE_EXEMPT_URL_PREFIXES = (
+    '/plugincheck/',
+    '/firefox/',
+    '/contribute/',
+    '/about/',
+    '/contact/',
+    '/thunderbird/',
+    '/newsletter/',
+    '/privacy/',
+    '/foundation/',
+    '/teach/',
+    '/gigabit/',
+    '/lightbeam/',
 )
 
 # Sessions
@@ -520,10 +545,6 @@ EXTERNAL_FILES = {
     },
 }
 
-FACEBOOK_LOCALES = ['en-US', 'es-ES', 'pt-BR', 'id', 'de']
-FACEBOOK_PAGE_NAMESPACE = 'DUMMY_PAGE_NAMESPACE'
-FACEBOOK_APP_ID = 'DUMMY_APP_ID'
-
 # Facebook Like button supported locales
 # https://www.facebook.com/translations/FacebookLocales.xml
 FACEBOOK_LIKE_LOCALES = ['af_ZA', 'ar_AR', 'az_AZ', 'be_BY', 'bg_BG',
@@ -542,15 +563,6 @@ FACEBOOK_LIKE_LOCALES = ['af_ZA', 'ar_AR', 'az_AZ', 'be_BY', 'bg_BG',
                          'sv_SE', 'sw_KE', 'ta_IN', 'te_IN', 'th_TH',
                          'tl_PH', 'tr_TR', 'uk_UA', 'vi_VN', 'zh_CN',
                          'zh_HK', 'zh_TW']
-
-
-# FACEBOOK_TAB_URL is lazily evaluated because it depends on the namespace
-# and app ID settings in local settings.
-def facebook_tab_url_lazy():
-    from django.conf import settings
-    return '//www.facebook.com/{page}/app_{id}'.format(
-        page=settings.FACEBOOK_PAGE_NAMESPACE, id=settings.FACEBOOK_APP_ID)
-FACEBOOK_TAB_URL = lazy(facebook_tab_url_lazy, str)()
 
 # Prefix for media. No trailing slash.
 # e.g. '//mozorg.cdn.mozilla.net'
@@ -596,93 +608,302 @@ MOBILIZER_LOCALE_LINK = {
     'cs': 'https://wiki.mozilla.org/Mobilizer/MobilizerCzechRepublic/'
 }
 
-DONATE_SPANISH_LINK = ('https://donate.mozilla.org/es/?presets=100,50,25,15&amount=50'
-    '&ref=EOYFR2015&utm_campaign=EOYFR2015&utm_source=mozilla.org'
-    '&utm_medium=referral&utm_content={source}&currency=eur')
+DONATE_LINK = ('https://donate.mozilla.org/{locale}/?presets={presets}'
+    '&amount={default}&ref=EOYFR2015&utm_campaign=EOYFR2015'
+    '&utm_source=mozilla.org&utm_medium=referral&utm_content={source}'
+    '&currency={currency}')
 
-DONATE_LOCALE_LINK = {
-    'default': (
-        'https://sendto.mozilla.org/page/contribute/Give-Now?source={source}'
-    ),
-    'en-US': (
-        'https://donate.mozilla.org/?presets=100,50,25,15'
-        '&amount=50&ref=EOYFR2015&utm_campaign=EOYFR2015'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content={source}'
-    ),
-    'cs': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-czk/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content=PPcurrency_CZK'
-    ),
-    'da': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-dkk/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source={source}&utm_medium=referral&utm_content=PPcurrency_DKK'
-    ),
-    'de': (
-        'https://donate.mozilla.org/de/?presets=100,50,25,15&amount=50'
-        '&ref=EOYFR2015&utm_campaign=EOYFR2015&utm_source=mozilla.org'
-        '&utm_medium=referral&utm_content={source}&currency=eur'
-    ),
-    'es-AR': DONATE_SPANISH_LINK,
-    'es-CL': DONATE_SPANISH_LINK,
-    'es-ES': DONATE_SPANISH_LINK,
-    'es-MX': DONATE_SPANISH_LINK,
-    'fr': (
-        'https://donate.mozilla.org/fr/?presets=100,50,25,15&amount=50'
-        '&ref=EOYFR2015&utm_campaign=EOYFR2015&utm_source=mozilla.org'
-        '&utm_medium=referral&utm_content={source}&currency=eur'
-    ),
-    'he': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-ils/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content=PPcurrency_ILS'
-    ),
-    'hu': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-huf/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content=PPcurrency_HUF'
-    ),
-    'ja': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-jpy/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content=PPcurrency_JPY'
-    ),
-    'nb-NO': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-nok/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content=PPcurrency_NOK'
-    ),
-    'nn-NO': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-nok/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content=PPcurrency_NOK'
-    ),
-    'pl': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-pln/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content=PPcurrency_PLN'
-    ),
-    'pt-BR': (
-        'https://donate.mozilla.org/pt-BR/?presets=375,187,90,55&amount=187'
-        '&ref=EOYFR2015&utm_campaign=EOYFR2015&utm_source=mozilla.org'
-        '&utm_medium=referral&utm_content={source}&currency=brl'
-    ),
-    'ru': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-rub/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content=PPcurrency_RUB'
-    ),
-    'sv-SE': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-sek/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content=PPcurrency_SEK'
-    ),
-    'th': (
-        'https://sendto.mozilla.org/page/content/paypal-donate-thb/?'
-        'source={source}&ref=EOYFR2014&utm_campaign=EOYFR2014'
-        '&utm_source=mozilla.org&utm_medium=referral&utm_content=PPcurrency_THB'
-    ),
+DONATE_PARAMS = {
+    'en-US': {
+        'currency': 'usd',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'an': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'as': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'ast': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'brx': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'ca': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'cs': {
+        'currency': 'czk',
+        'presets': '400,200,100,55',
+        'default': '200'
+    },
+    'cy': {
+        'currency': 'gbp',
+        'presets': '20,10,5,3',
+        'default': '10'
+    },
+    'da': {
+        'currency': 'dkk',
+        'presets': '160,80,40,20',
+        'default': '80'
+    },
+    'de': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'dsb': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'el': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'en-GB': {
+        'currency': 'gbp',
+        'presets': '20,10,5,3',
+        'default': '10'
+    },
+    'es-ES': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'es-MX': {
+        'currency': 'mxn',
+        'presets': '240,120,60,35',
+        'default': '120'
+    },
+    'eo': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'et': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'eu': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'fi': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'fr': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'fy-NL': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'ga-IE': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'gd': {
+        'currency': 'gbp',
+        'presets': '20,10,5,3',
+        'default': '10'
+    },
+    'gl': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'gu-IN': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'he': {
+        'currency': 'ils',
+        'presets': '60,30,15,9',
+        'default': '30'
+    },
+    'hi-IN': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'hsb': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'hu': {
+        'currency': 'huf',
+        'presets': '4000,2000,1000,600',
+        'default': '2000'
+    },
+    'id': {
+        'currency': 'idr',
+        'presets': '270000,140000,70000,40000',
+        'default': '140000'
+    },
+    'in': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'it': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'ja': {
+        'currency': 'jpy',
+        'presets': '1600,800,400,250',
+        'default': '800'
+    },
+    'ja-JP': {
+        'currency': 'jpy',
+        'presets': '1600,800,400,250',
+        'default': '800'
+    },
+    'ja-JP-mac': {
+        'currency': 'jpy',
+        'presets': '1600,800,400,250',
+        'default': '800'
+    },
+    'kn': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'lij': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'lt': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'lv': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'ml': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'mr': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'nb-NO': {
+        'currency': 'nok',
+        'presets': '160,80,40,20',
+        'default': '80'
+    },
+    'nn-NO': {
+        'currency': 'nok',
+        'presets': '160,80,40,20',
+        'default': '80'
+    },
+    'nl': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'or': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'pa-IN': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'pl': {
+        'currency': 'pln',
+        'presets': '80,40,20,10',
+        'default': '40'
+    },
+    'pt-BR': {
+        'currency': 'brl',
+        'presets': '375,187,90,55',
+        'default': '187'
+    },
+    'pt-PT': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'ru': {
+        'currency': 'rub',
+        'presets': '1000,500,250,140',
+        'default': '500'
+    },
+    'sat': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'sk': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'sl': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'sv-SE': {
+        'currency': 'sek',
+        'presets': '160,80,40,20',
+        'default': '80'
+    },
+    'sr': {
+        'currency': 'eur',
+        'presets': '100,50,25,15',
+        'default': '50'
+    },
+    'ta': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'te': {
+        'currency': 'inr',
+        'presets': '1000,500,250,150',
+        'default': '500'
+    },
+    'th': {
+        'currency': 'thb',
+        'presets': '500,250,125,75',
+        'default': '250'
+    },
 }
 
 # Official Firefox Twitter accounts
@@ -712,7 +933,7 @@ MAPBOX_ACCESS_TOKEN = config(
 TABZILLA_INFOBAR_OPTIONS = 'update translation'
 
 # Optimize.ly project code
-OPTIMIZELY_PROJECT_ID = None
+OPTIMIZELY_PROJECT_ID = config('OPTIMIZELY_PROJECT_ID', default='')
 
 # Fx Accounts iframe source
 # Prod, stage, dev, & demos have this set in their local.py files.
@@ -726,27 +947,15 @@ OPTIMIZELY_PROJECT_ID = None
 #
 # For demo server testing, configure Fx40+ as detailed here:
 # https://bugzilla.mozilla.org/show_bug.cgi?id=1150231#c28
+#
+# To clear browser cache while testing multiple accounts, append '/clear' to
+# the iframe's source URL, e.g. https://accounts.stage.mozaws.net/clear
 FXA_IFRAME_SRC = config('FXA_IFRAME_SRC',
                         default='https://accounts.firefox.com/')
 
-# Link to Firefox for Android on the Google Play store with Google Analytics
-# campaign parameters.
-# To clarify below, 'referrer' key value must be a URL encoded string of utm_*
-# key/values (https://bugzilla.mozilla.org/show_bug.cgi?id=1099429#c0).
-GOOGLE_PLAY_FIREFOX_LINK = ('https://play.google.com/store/apps/details?' +
-                            'id=org.mozilla.firefox&referrer=' +
-                            urlquote('utm_source=mozilla&utm_medium=Referral&'
-                                     'utm_campaign=mozilla-org'))
-
-# Link to Firefox for iOS on the Apple App Store with Google Analytics
-# campaign patameters. Each implementation should add a "ct" parameter
-# for analytics.
-
-# Note: this URL is likely to change for Fx42. See bug comment:
-# https://bugzilla.mozilla.org/show_bug.cgi?id=1196310#c18
-APPLE_APPSTORE_FIREFOX_LINK = ('https://itunes.apple.com/app/apple-store/' +
-                               'id989804926?pt=373246&mt=8')
-
+# Google Play and Apple App Store settings
+from .appstores import (GOOGLE_PLAY_FIREFOX_LINK,  # noqa
+                        APPLE_APPSTORE_FIREFOX_LINK, APPLE_APPSTORE_COUNTRY_MAP)
 
 # Locales that should display the 'Send to Device' widget
 SEND_TO_DEVICE_LOCALES = ['de', 'en-GB', 'en-US', 'en-ZA',
@@ -895,3 +1104,9 @@ if not SSLIFY_DISABLE:
 SSLIFY_DISABLE_FOR_REQUEST = [
     lambda request: request.get_full_path() == '/healthz/'
 ]
+
+NEWRELIC_BROWSER_LICENSE_KEY = config('NEWRELIC_BROWSER_LICENSE_KEY', default='')
+NEWRELIC_APP_ID = config('NEWRELIC_APP_ID', default='')
+
+# temporary home until product details is updated
+FIREFOX_IOS_RELEASE_VERSION = '1.3'

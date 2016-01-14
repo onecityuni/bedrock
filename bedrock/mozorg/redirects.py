@@ -526,10 +526,10 @@ redirectpatterns = (
     # openwebfund/ and openwebfund/index.html redirect to another site.  Careful because
     # there are other pages under openwebfund that still need to be served from Bedrock.
     redirect(r'^foundation/openwebfund/(index\.html)?$',
-             'https://sendto.mozilla.org/page/contribute/join-mozilla?source=owf_redirect',
+             'https://donate.mozilla.org/?source=owf_redirect',
              re_flags='i'),
     redirect(r'^foundation/donate\.html$',
-             'https://sendto.mozilla.org/page/contribute/openwebfund', re_flags='i'),
+             'https://donate.mozilla.org/?source=donate_redirect', re_flags='i'),
 
     # FIXUPs for changing foo/bar.html to foo/bar/
     # Redirect foundation/foo.html to foundation/foo/, with a redirect for the nice search engines
@@ -572,7 +572,16 @@ redirectpatterns = (
     # bug 1003737
     redirect(r'^impressum/?$', '/about/legal/impressum/'),
 
+    # bug 1236910
+    redirect(r'^support(/.*)?$', 'https://support.mozilla.org/'),
+
+    # bug 1233015
+    redirect(r'^about/partnerships/contentservices(/.*)?$', 'mozorg.partnerships'),
+
     # bug 832348 **/index.html -> **/
     # leave this at the bottom
     redirect(r'^(.*)/index\.html$', '/{}/', locale_prefix=False),
+
+    # Bug 1235853
+    redirect(r'^facebookapps(/.*)?$', 'firefox.new'),
 )

@@ -11,17 +11,17 @@ class DoNotTrackPage(FirefoxBasePage):
 
     _url = '{base_url}/{locale}/firefox/dnt'
 
-    _dnt_status = (By.CSS_SELECTOR, '#dnt-status > h5')
+    _dnt_status_locator = (By.CSS_SELECTOR, '#dnt-status > h5')
     _faqs_locator = (By.CSS_SELECTOR, '#faq > section')
 
     @property
     def frequently_asked_questions(self):
-        return [FrequentlyAskedQuestion(self.base_url, self.selenium, root=el) for el in
+        return [FrequentlyAskedQuestion(self, root=el) for el in
                 self.find_elements(self._faqs_locator)]
 
     @property
     def is_do_not_track_status_displayed(self):
-        return self.is_element_displayed(self._dnt_status)
+        return self.is_element_displayed(self._dnt_status_locator)
 
 
 class FrequentlyAskedQuestion(FirefoxBasePageRegion):

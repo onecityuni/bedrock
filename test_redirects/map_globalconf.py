@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import absolute_import
 
 from .base import flatten, url_test
-
 
 URLS = flatten((
     # bug 832348 **/index.html -> **/
@@ -219,7 +220,6 @@ URLS = flatten((
     url_test('/{m,{firefox/,}mobile}/features/', '/firefox/android/'),
     url_test('/{m,{firefox/,}mobile}/faq/', '/firefox/android/faq/'),
 
-
     # bug 885799, 952429
     url_test('/projects/calendar/holidays.html', '/projects/calendar/holidays/'),
     url_test('/en-US/projects/calendar/random/stuff/', '/projects/calendar/'),
@@ -254,8 +254,10 @@ URLS = flatten((
 
     # bug 1196578
     url_test('/thunderbird/about/legal/eula/', '/about/legal/eula/'),
-    url_test('/thunderbird/about/legal/eula/thunderbird2.html', '/about/legal/eula/thunderbird-2/'),
-    url_test('/thunderbird/about/legal/eula/thunderbird.html', '/about/legal/eula/thunderbird-1.5/'),
+    url_test('/thunderbird/about/legal/eula/thunderbird2.html',
+             '/about/legal/eula/thunderbird-2/'),
+    url_test('/thunderbird/about/legal/eula/thunderbird.html',
+             '/about/legal/eula/thunderbird-1.5/'),
 
     # bug 1204579
     url_test('/thunderbird/2.0.0.0/eula/', '/about/legal/eula/thunderbird-2/'),
@@ -322,12 +324,13 @@ URLS = flatten((
     # Bug 920212
     url_test('/firefox/fx/', '/firefox/new/'),
 
-    # Bug 979670, 979531, 1003727, 979664, 979654, 979660
+    # Bug 979670, 979531, 1003727, 979664, 979654, 979660, 1150713
     url_test('/firefox/features/', '/firefox/desktop/'),
     url_test('/firefox/customize/', '/firefox/desktop/customize/'),
     url_test('/firefox/{performance,happy,speed,memory}/', '/firefox/desktop/fast/'),
     url_test('/firefox/security/', '/firefox/desktop/trust/'),
     url_test('/firefox/technology/', 'https://developer.mozilla.org/docs/Tools'),
+    url_test('/firefox/sms/{,sent}', '/firefox/products/'),
 
     # Bug 979527
     url_test('/firefox/central/', '/firefox/new/',
@@ -364,7 +367,7 @@ URLS = flatten((
     url_test('/press/mozilla-2004-06-16.html',
              'http://blog.mozilla.org/press/2004/06/mozilla-foundation-releases-thunderbird-0-7/'),
     url_test('/press/mozilla-2004-06-30.html',
-             'http://blog.mozilla.org/press/2013/11/mozilla-foundation-announces-more-open-scriptable-plugins/'),
+             'http://blog.mozilla.org/press/2004/06/mozilla-foundation-announces-more-open-scriptable-plugins/'),
     url_test('/press/mozilla-2004-08-02.html',
              'http://blog.mozilla.org/press/2004/08/mozilla-foundation-announces-security-bug-bounty-program/'),
     url_test('/press/mozilla-2004-08-10.html',
@@ -374,7 +377,7 @@ URLS = flatten((
     url_test('/press/mozilla-2004-09-14-01.html',
              'http://blog.mozilla.org/press/2004/09/mozilla-foundation-announces-first-payments-of-security-bug-bounty-program-further-strengthens-browser-security/'),
     url_test('/press/mozilla-2004-09-14-02.html',
-             'http://blog.mozilla.org/press/2013/11/firefox-preview-release-and-thunderbird-0-8-released/'),
+             'http://blog.mozilla.org/press/2004/09/firefox-preview-release-and-thunderbird-0-8-released/'),
     url_test('/press/mozilla-2004-09-20.html',
              'http://blog.mozilla.org/press/2004/09/mozilla-firefox-preview-release-hits-one-million-downloads-in-first-four-days-of-availability/'),
     url_test('/press/mozilla-2004-10-01-02.html',
@@ -494,9 +497,9 @@ URLS = flatten((
     url_test('/press/mozilla-2009-03-31.html',
              'https://blog.mozilla.org/press/2009/03/%C2%AD%C2%ADmozilla-adds-style-and-star-power-to-firefox-with-new-personas/'),
     url_test('/press/mozilla-2009-06-30-faq.html',
-             'http://blog.mozilla.org/press/2009/04/mozilla-advances-the-web-with-firefox-3-5/'),
+             'http://blog.mozilla.org/press/2009/06/mozilla-advances-the-web-with-firefox-3-5/'),
     url_test('/press/mozilla-2009-06-30.html',
-             'http://blog.mozilla.org/press/2009/04/mozilla-advances-the-web-with-firefox-3-5/'),
+             'http://blog.mozilla.org/press/2009/06/mozilla-advances-the-web-with-firefox-3-5/'),
     url_test('/press/mozilla-foundation.html',
              'http://blog.mozilla.org/press/2003/07/mozilla-org-announces-launch-of-the-mozilla-foundation-to-lead-open-source-browser-efforts/'),
     url_test('/press/mozilla1.0.html',
@@ -799,7 +802,8 @@ URLS = flatten((
     url_test('/legal/bylaws_amendment_1.html', '/foundation/documents/bylaws-amendment-1/'),
     url_test('/legal/bylaws_amendment_2.html', '/foundation/documents/bylaws-amendment-2/'),
     url_test('/legal/articles.html', '/foundation/documents/articles-of-incorporation/'),
-    url_test('/legal/amendment.html', '/foundation/documents/articles-of-incorporation/amendment/'),
+    url_test('/legal/amendment.html',
+             '/foundation/documents/articles-of-incorporation/amendment/'),
     url_test('/legal/bylaws.html', '/foundation/documents/bylaws/'),
 
     # bug 1211007
@@ -884,9 +888,9 @@ URLS = flatten((
     # openwebfund/ and openwebfund/index.html redirect to another site.  Careful because
     # there are other pages under openwebfund that still need to be served from Bedrock.
     url_test('/foundation/openwebfund/',
-             'https://sendto.mozilla.org/page/contribute/join-mozilla?source=owf_redirect'),
+             'https://donate.mozilla.org/?source=owf_redirect'),
     url_test('/foundation/donate.html',
-             'https://sendto.mozilla.org/page/contribute/openwebfund'),
+             'https://donate.mozilla.org/?source=donate_redirect'),
 
     # FIXUPs for changing foo/bar.html to foo/bar/
     # Redirect foundation/foo.html to foundation/foo/, with a redirect for the nice search engines
@@ -913,4 +917,19 @@ URLS = flatten((
     url_test('/firefox/hello/feedbacksurvey/',
              'https://www.surveygizmo.com/s3/2319863/d2b7dc4b5687',
              status_code=302),
+
+    # bug 1224060
+    url_test('/ja/firefox/ios/1.0/{releasenotes,system-requirements}/',
+             'http://www.mozilla.jp/firefox/ios/1.0/{releasenotes,system-requirements}/'),
+
+    # bug 1236791
+    url_test('/en-US/firefox/new/?product=firefox-{3.6.8,13.0.1}{&os={osx〈=en-US,win},}',
+             '/en-US/firefox/new/'),
+
+    # bug 1233015
+    url_test('/en-US/about/partnerships/contentservices/{,user-respect/}',
+             '/en-US/about/partnerships/'),
+
+    # bug 1235853
+    url_test('/facebookapps/{,downloadtab/}', '/firefox/new/')
 ))
