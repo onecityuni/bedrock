@@ -1007,6 +1007,7 @@ PIPELINE_JS = {
     'contribute-taskview': {
         'source_filenames': (
             'js/base/global.js',
+            'js/base/mozilla-client.js',
             'js/mozorg/contribute/taskview.js',
         ),
         'output_filename': 'css/contribute-taskview-bundle.js',

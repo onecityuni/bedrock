@@ -13,7 +13,7 @@ $(function() {
     var $signupTweetForm = $('#signup-tweet');
 
     // some tasks, like installing Whimsy, required the user to be using Firefox
-    if ($getFirefox.length > -1 && !isFirefox()) {
+    if ($getFirefox.length > -1 && !Mozilla.Client.isFirefox) {
         $getFirefox.toggleClass('hidden');
     }
 
