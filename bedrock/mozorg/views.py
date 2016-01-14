@@ -68,7 +68,7 @@ def mozid_data_view(request, source_name):
 
 
 class ContributeSignup(l10n_utils.LangFilesMixin, FormView):
-    template_name = 'mozorg/contribute/signup.html'
+    template_name = 'mozorg/contribute/signup-new.html'
     form_class = ContributeSignupForm
     category = None
 
@@ -240,6 +240,11 @@ def contribute_signup(request):
                                      '2015_signup_form')
     view_class = ContributeSignup if use_new_form else ContributeSignupOldForm
     return view_class.as_view()(request)
+
+
+def contribute_signup_alternate(request):
+    template_name = 'mozorg/contribute/signup-alternate.html'
+    return l10n_utils.render(request, template_name)
 
 
 @csrf_exempt

@@ -33,7 +33,6 @@ urlpatterns = (
     # Bug 981063, catch all for old calendar urls.
     # must be here to avoid overriding the above
     redirect(r'^projects/calendar/', 'mozorg.projects.calendar', locale_prefix=False),
-    page('button', 'mozorg/button.html'),
     page('mission', 'mozorg/mission.html'),
     page('ITU', 'mozorg/itu.html'),
     page('about/powered-by', 'mozorg/powered-by.html'),
@@ -212,6 +211,23 @@ urlpatterns = (
         kwargs={'template': 'mozorg/contribute/contribute-embed.html',
                 'return_to_form': False}),
     url('^contribute/signup/$', views.contribute_signup, name='mozorg.contribute.signup'),
+    url('^contribute/signup_alternate/$', views.contribute_signup_alternate,
+        name='mozorg.contribute.signup_alternate'),
+
+    page('contribute/task/whimsy', 'mozorg/contribute/tasks/whimsy.html'),
+    page('contribute/task/firefox-mobile', 'mozorg/contribute/tasks/firefox-mobile.html'),
+    page('contribute/task/follow-mozilla', 'mozorg/contribute/tasks/follow-mozilla.html'),
+    page('contribute/task/joy-of-coding', 'mozorg/contribute/tasks/joy-of-coding.html'),
+    page('contribute/task/build-firefox', 'mozorg/contribute/tasks/build-firefox.html'),
+    page('contribute/task/devtools-challenger', 'mozorg/contribute/tasks/devtools-challenger.html'),
+
+    page('contribute/task/v2/whimsy', 'mozorg/contribute/tasks/v2/whimsy.html'),
+    page('contribute/task/v2/firefox-mobile', 'mozorg/contribute/tasks/v2/firefox-mobile.html'),
+    page('contribute/task/v2/follow-mozilla', 'mozorg/contribute/tasks/v2/follow-mozilla.html'),
+    page('contribute/task/v2/joy-of-coding', 'mozorg/contribute/tasks/v2/joy-of-coding.html'),
+    page('contribute/task/v2/build-firefox', 'mozorg/contribute/tasks/v2/build-firefox.html'),
+    page('contribute/task/v2/devtools-challenger', 'mozorg/contribute/tasks/v2/devtools-challenger.html'),
+
     url('^contribute/thankyou/$',
         views.ContributeSignupThankyou.as_view(),
         name='mozorg.contribute.thankyou'),

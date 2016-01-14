@@ -1,0 +1,107 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+@import "../../sandstone/lib.less";
+
+.sand #outer-wrapper {
+    background: none;
+}
+
+.page-head {
+    padding-top: 5.714em;
+}
+
+main {
+    h2 {
+        margin: (@baseLine * 3) 0;
+        text-align: center;
+    }
+}
+
+.simple,
+.challenging {
+    text-align: center;
+    list-style: none;
+    .clearfix;
+}
+
+.task {
+    position: relative;
+    .span(4);
+
+    h3 {
+        .font-size(19px);
+
+        &.fx-mobile:before {
+            background-position: -324px -8px;
+        }
+
+        &.fx-twitter:before {
+            background-position: -649px -8px;
+        }
+
+        &.coding:before {
+            background-position: -6px -217px;
+        }
+
+        &.fxos:before {
+            background-position: -324px -219px;
+        }
+
+        &.devtools:before {
+            background-position: -649px -219px;
+        }
+    }
+
+    h3:before {
+        display: block;
+        content: '';
+        background: transparent url('/media/img/contribute/signup/tasks-sprite.png') -8px -8px no-repeat;
+        margin: 0 auto 20px;
+        border: 2px solid #d1d2d3;
+        border-radius: 50%;
+        width: 194px;
+        height: 194px;
+    }
+
+    a:link,
+    a:visited {
+        display: block;
+        color: #0c99d5;
+        margin: 0 auto;
+        padding: 1rem;
+        border: 1px solid #d1d2d3;
+        border-radius: 8px;
+        width: 80%;
+        .font-size(1rem);
+    }
+
+    a:hover,
+    a:focus {
+        border-color: #909090;
+        text-decoration: none;
+    }
+}
+
+.tooltip {
+    position: absolute;
+    top: -70px;
+    background-image: none;
+    background-color: #fff;
+    color: #32333a;
+    box-shadow: none;
+    .open-sans-light;
+    .font-size(14px);
+    line-height: 1.3;
+    text-shadow: none;
+
+    &:after {
+        left: 45%;
+        border-color: #fff transparent;
+    }
+}
+
+.hidden {
+    display: none;
+}
