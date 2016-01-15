@@ -19,10 +19,10 @@
         <p>{{ _('<a href="https://twitter.com/mike_conley" rel="external">@mike_conley</a> livehacks on real Firefox bugs while thinking out loud.') }}</p>
       </header>
       <div class="step-content">
-        <video id="joc" preload="none" controls poster="{{ static('/media/img/contribute/signup/joc_poster.png') }}" data-action="play" data-task="joyofcoding" data-step="one" data-complete="false">
+        <video id="joc" preload="none" controls poster="{{ static('/media/img/contribute/signup/joc_poster.png') }}" data-action="play" data-task="joyofcoding" data-step="one" data-complete="false" data-variation="2">
           <source src="{{ static('/media/img/contribute/signup/joc-video.mp4') }}" type="video/mp4" />
         </video>
-        <button type="button" data-action="play" data-task="joyofcoding" data-step="one" data-complete="false">{{ _('Watch Video') }}</button>
+        <button type="button" data-action="play" data-task="joyofcoding" data-step="one" data-complete="false" data-variation="2">{{ _('Watch Video') }}</button>
       </div>
     </li>
     <li id="step_two" class="two">
@@ -30,7 +30,7 @@
         <h3>{{ _('Join the discussion') }}</h3>
       </header>
       <div class="step-content">
-        <p>{{ _('<a href="%s" rel="external" data-action="discuss" data-task="joyofcoding" data-step="two" data-complete="true" target=_blank>Sign in to our internal video site, Air Mozilla</a>, to discuss the video with other Mozillians.')|format('https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-1/') }}</p>
+        <p>{{ _('<a href="%s" rel="external" data-action="discuss" data-task="joyofcoding" data-step="two" data-complete="true" data-variation="2" target=_blank>Sign in to our internal video site, Air Mozilla</a>, to discuss the video with other Mozillians.')|format('https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-1/') }}</p>
       </div>
     </li>
   </ol>

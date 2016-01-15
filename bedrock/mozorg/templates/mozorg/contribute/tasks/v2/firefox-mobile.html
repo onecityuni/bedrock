@@ -20,10 +20,10 @@
       <div class="step-content">
         <div class="download-button-wrapper">
           <a rel="external"  class="download-link" href="{{ settings.GOOGLE_PLAY_FIREFOX_LINK }}" target="_blank">
-            {{ high_res_img('firefox/android/btn-google-play.png', {'alt': _('Get it on Google Play'), 'width': '129', 'height': '45', 'l10n': True, 'data-action': 'install', 'data-task': 'firefox-mobile', 'data-step': 'one', 'data-complete': 'false'}) }}
+            {{ high_res_img('firefox/android/btn-google-play.png', {'alt': _('Get it on Google Play'), 'width': '129', 'height': '45', 'l10n': True, 'data-action': 'install', 'data-task': 'firefox-mobile', 'data-step': 'one', 'data-complete': 'false', 'data-variation': '2', 'data-mobileversion': 'Android'}) }}
           </a>
           <a rel="external" class="download-link" href="{{settings.APPLE_APPSTORE_FIREFOX_LINK}}" target="_blank">
-            <img src="{{ l10n_img('firefox/ios/btn-app-store.svg') }}" alt="{{ _('Download on the App Store') }}" width="152" height="45" data-action="install" data-task="firefox-mobile" data-step="one" data-complete="false" />
+            <img src="{{ l10n_img('firefox/ios/btn-app-store.svg') }}" alt="{{ _('Download on the App Store') }}" width="152" height="45" data-action="install" data-task="firefox-mobile" data-step="one" data-complete="false" data-variation="2" data-mobileversion="iOS" />
           </a>
         </div>
       </div>
@@ -39,7 +39,7 @@
             <textarea name="text" id="tweet_txt" maxlength="140">{{ _('Firefox is available everywhere! Now you can get it for desktop, iOS or Android!') }} https://www.mozilla.org/firefox/products</textarea>
             <p>Number of characters left: <span class="char-count"></span></p>
             <input type="hidden" id="hashtag" name="hashtags" value="MozParticipate" />
-            <input type="submit" value="Tweet" data-action="tweet" data-task="firefox-mobile" data-step="two" data-complete="true" />
+            <input type="submit" value="Tweet" data-action="tweet" data-task="firefox-mobile" data-step="two" data-complete="true" data-variation="2" />
           </fieldset>
         </form>
       </div>
