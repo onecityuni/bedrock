@@ -79,6 +79,20 @@ $(function() {
     }
 
     /**
+     * Sends data to GA about the interaction steps a use has taken.
+     * @param {string} interaction - The kind of interaction
+     * @param {int} variation - Whether is a v1 or v2 task.
+     */
+    function trackInteraction(interaction, variation) {
+        console.log('trackInteraction: ' + interaction, variation);
+        window.dataLayer.push({
+            event: 'get-involved-task-interaction',
+            interaction: interaction,
+            variation: variation
+        });
+    }
+
+    /**
      *
      */
     function initTweetForm() {
@@ -120,8 +134,10 @@ $(function() {
             event.preventDefault();
             // do stuff
             completeStep($this);
+            trackInteraction('install whimsy', $this.data('variation'));
         } else if ($this.data('action') === 'rate') {
             handleVisibilityChange($this);
+            trackInteraction('AMO exit link', $this.data('variation'));
         }
     }
 
@@ -133,6 +149,7 @@ $(function() {
 
         if ($this.data('action') === 'install') {
             handleVisibilityChange($this);
+            trackInteraction('install ' + $this.data('mobileversion'), $this.data('variation'));
         }
     }
 
@@ -147,6 +164,7 @@ $(function() {
             event.preventDefault();
             window.open(intentURL, 'twitter', 'width=550,height=480,scrollbars');
             handleFocusChange($this);
+            trackInteraction('follow startmozilla', $this.data('variation'));
         }
     }
 
@@ -164,6 +182,7 @@ $(function() {
             // still be in the paused state. We need to manually play the video.
             if (videoElement.paused) {
                 videoElement.play();
+                trackInteraction('play joy of coding', $this.data('variation'));
             }
 
             // a user can click play again after having watched the video the
@@ -180,11 +199,13 @@ $(function() {
                         // remove the event listener.
                         $jocVideo.off('timeupdate.taskview');
                         $jocVideo.data('watched', true);
+                        trackInteraction('completed joy of coding', $this.data('variation'));
                     }
                 });
             }
         } else if ($this.data('action') === 'discuss') {
             handleVisibilityChange($this);
+            trackInteraction('joy of coding exit link', $this.data('variation'));
         }
     }
 
@@ -196,6 +217,7 @@ $(function() {
 
         if ($this.data('action') === 'join') {
             handleVisibilityChange($this);
+            trackInteraction('foxfooding exit link', $this.data('variation'));
         }
     }
 
@@ -207,6 +229,7 @@ $(function() {
 
         if ($this.data('action') === 'challenger') {
             handleVisibilityChange($this);
+            trackInteraction('devtools challenger exit link', $this.data('variation'));
         }
     }
 
