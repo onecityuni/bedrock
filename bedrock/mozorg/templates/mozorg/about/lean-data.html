@@ -14,37 +14,44 @@
 
 {% block content %}
   <section class="data-header">
-    <img src="{{ static('img/mozorg/about/lean-data/data-hero.svg') }}" alt="" />
+    <img src="{{ static('img/mozorg/about/lean-data/hero-data.svg') }}" alt="" />
   </section>
   <main role="main">
     <h2 class="title-shadow-box">{{ _('Lean Data Practices') }}</h2>
-    <p class="lead-in">{{ _('Data can be very useful, but it’s also important to be smart about how you collect it. Staying lean can build trust with your users and ultimately help grow your business.') }}</p>
+    <p class="lead-in">{{ _('Staying lean and being smart about how you collect data can build trust with your users and ultimately help grow your business.') }}</p>
+
+    <a href="replace-me" class="github-button more" rel="external"  target="_blank">{{ _('Get the toolkit') }}</a>
+
     <section class="why">
       <h3>{{ ('How lean data practices build strong brands') }}</h3>
-      <div class="box-container orient-left">
-        <h4>{{ ('Increased trust') }}</h4>
-        <p class="hand-shake">{{ _('Users are much less likely to use products and services they don’t trust. Once trust is lost, it is hard — and sometimes impossible — to regain.') }}</p>
-      </div>
-      <div class="box-container orient-right">
-        <h4>{{ ('Reduced risk') }}</h4>
-        <p class="lock">{{ _('Every additional byte you store increases your operating costs and your breach and regulatory risk.') }}</p>
-      </div>
+      <ol>
+        <li>
+          <h4>{{ ('Increased trust') }}</h4>
+          <p>{{ _('Users are much less likely to use products and services they don’t trust. Once trust is lost, it is hard — and sometimes impossible — to regain.') }}</p>
+          {% include 'mozorg/about/includes/list-number-1.svg' %}
+        </li>
+        <li>
+          <h4>{{ ('Reduced risk') }}</h4>
+          <p class="lock">{{ _('Every additional byte you store increases your operating costs and your breach and regulatory risk.') }}</p>
+          {% include 'mozorg/about/includes/list-number-2.svg' %}
+        </li>
+      </ol>
     </section>
 
     <section class="how">
-      <h3>{{ _('Steps you can take') }}</h3>
-      <div class="topic-content grid">
+      <h3>{{ _('Ways you can implement Lean Data Practices') }}</h3>
+      <div class="topic-content">
         <h4>{{ _('Stay lean') }}</h4>
-        <p>{{ _('Do I need this data to provide the value I’m trying to deliver to users through my business or product?') }}</p>
+        <p class="lean">{{ _('Do I need this data to provide the value I’m trying to deliver to users through my business or product?') }}</p>
         <ul>
           <li>{{ _('If you don’t need a piece of data try not to collect it.') }}</li>
           <li>{{ _('If you do need a piece of data, try to keep it for only as long as necessary and anonymize the data before you store it.') }}</li>
         </ul>
       </div>
 
-      <div class="topic-content security">
+      <div class="topic-content">
         <h4>{{ _('Build in security') }}</h4>
-        <p>{{ _('What protections have I put around the data I’ve collected?') }}</p>
+        <p class="security">{{ _('What protections have I put around the data I’ve collected?') }}</p>
         <ul>
           <li>{{ _('Limit access to the data to those who truly need access.') }}</li>
           <li>{{ _('Encrypt it while you’re moving it.') }}</li>
@@ -52,9 +59,9 @@
         </ul>
       </div>
 
-      <div class="topic-content engage">
+      <div class="topic-content">
         <h4>{{ _('Engage your users') }}</h4>
-        <p>{{ _('Is the way I’m collecting, using and disclosing data clear to my users?') }}</p>
+        <p class="engage">{{ _('Is the way I’m collecting, using and disclosing data clear to my users?') }}</p>
         <ul>
           <li>{{ _('Ideally, data practices should be designed to be obvious, but in some cases this can’t happen. If practices can’t be made obvious, then tell your users about it in user experience, privacy notices and support documentation.') }}</li>
         </ul>
@@ -64,14 +71,7 @@
     <section class="toolkit">
       <h3>{{ _('Get the toolkit') }}</h3>
       <p>{{ _('We’ve put together a toolkit to help you practice Lean Data Practices at your company.') }}</p>
-      <ul>
-        <li class="implement-ldp">
-          <a href="" class="simple-button" rel="external">{{ _('Implementing LDP') }}</a>
-        </li>
-        <li class="spreadsheet">
-          <a href="" class="simple-button" rel="external">{{ _('Data Worksheet') }}</a>
-        </li>
-      </ul>
+      <a href="replace-me" class="github-button more" rel="external"  target="_blank">{{ _('Get the toolkit') }}</a>
     </section>
   </main>
 {% endblock %}
