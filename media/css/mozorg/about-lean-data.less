@@ -14,13 +14,12 @@
     border-radius: 50%;
 }
 
-.topic-image() {
+.topic-image(@width: 180px, @height: 180px) {
     display: block;
     content: '';
-    float: left;
-    margin-right: @baseLine * 2;
-    width: 200px;
-    height: 200px;
+    margin: 0 auto;
+    width: @width;
+    height: @height;
 }
 
 .data-header {
@@ -31,7 +30,7 @@
 main {
     background-color: #fff;
     margin: 0 auto;
-    padding: 0px (@baseLine * 5);
+    padding: 0px 30px;
     width: 960px;
     .border-box;
 
@@ -41,18 +40,55 @@ main {
     }
 
     .title-shadow-box {
-        margin-left: -80px;
+        width: 360px;
         min-height: 80px;
     }
 
     .lead-in {
-        background: transparent url('/media/img/mission/thin-stripe.png') 0 100% repeat-x;
-        padding-bottom: @baseLine * 2;
+        margin-bottom: 30px;
         .font-size(1.8rem);
-        line-height: 1.5;
+        line-height: 1.2;
         text-align: center;
         clear: both;
         .open-sans-light;
+    }
+}
+
+.github-button {
+    display: block;
+    background-color: #0C99D5;
+    color: #fff;
+    margin: 0 auto;
+    padding: 10px 4px;
+    border: none;
+    border-radius: 6px;
+    width: 250px;
+    .font-size(0.875rem);
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    transition: background-color 0.3s ease 0s;
+
+    &:link,
+    &:visited {
+        text-decoration: none;
+    }
+
+    &:hover,
+    &:focus {
+        background-color: #2165A9;
+        color: #fff;
+    }
+
+    &:before {
+        display: inline-block;
+        content: '';
+        .at2x('/media/img/mozorg/about/lean-data/github-icon.png', 40px, 40px);
+        background-repeat: no-repeat;
+        margin-right: 10px;
+        width: 40px;
+        height: 40px;
+        vertical-align: middle;
     }
 }
 
@@ -60,19 +96,9 @@ main {
     vertical-align: top;
 }
 
-.orient-left,
-.orient-right {
-    display: inline-block;
-    width: 40%;
-}
-
-.orient-left {
-    margin-right: 3rem;
-}
-
 .why {
     background: transparent url('/media/img/mission/thin-stripe.png') 0 100% repeat-x;
-    padding: (@baseLine * 2) 0;
+    padding: (@baseLine * 3) 0;
     text-align: center;
 
     h3 {
@@ -81,23 +107,31 @@ main {
         .open-sans-light;
     }
 
-    .box-container {
-        min-height: 380px;
+    ol {
+        margin: 0 auto;
+        max-width: 600px;
+        text-align: left;
+
+        li {
+            position: relative;
+            margin: 0 0 15px;
+            padding: 10px 0 0 70px;
+            min-height: 55px;
+            .font-size(@largeFontSize);
+            list-style-type: none;
+        }
     }
 
-    .hand-shake:before {
-        background: url('/media/img/mozorg/about/lean-data/shake.png') 50% 50% no-repeat;
-        .circular-image(#5BC0A4);
-    }
-
-    .lock:before {
-        background: url('/media/img/mozorg/about/lean-data/lock.png') 50% 50% no-repeat;
-        .circular-image(#5BC0A4);
+    .list-number {
+        width: 55px;
+        height: 55px;
+        position: absolute;
+        left: -5px;
+        top: 0;
     }
 }
 
 .how {
-    background: transparent url('/media/img/mission/thin-stripe.png') 0 100% repeat-x;
     padding-top: @baseLine * 2;
     text-align: center;
     .clearfix;
@@ -118,36 +152,47 @@ main {
     }
 
     .topic-content {
-        margin-bottom: @baseLine * 5;
-        text-align: left;
+        display: inline-block;
+        margin: 0 10px;
+        width: 280px;
+        vertical-align: top;
 
         p {
             font-style: italic;
         }
 
         li {
-            margin-left: @baseLine;
+            margin: 0 0 10px @baseLine;
+            text-align: left;
         }
     }
 
-    .grid:before {
-        background: transparent url('/media/img/mozorg/about/lean-data/grid.png') 0 0 no-repeat;
-        .topic-image;
+    .topic-content:first-child {
+        margin-left: 0;
+    }
+
+    .topic-content:last-child {
+        margin-right: 0;
+    }
+
+    .lean:before {
+        background: transparent url('/media/img/mozorg/about/lean-data/lean-data-icon.svg') 0 0 no-repeat;
+        .topic-image(220px, 130px);
     }
 
     .security:before {
-        background: transparent url('/media/img/mozorg/about/lean-data/house.png') 0 0 no-repeat;
-        .topic-image;
+        background: transparent url('/media/img/mozorg/about/lean-data/security-icon.svg') 0 0 no-repeat;
+        .topic-image(130px, 130px);
     }
 
     .engage:before {
-        background: transparent url('/media/img/mozorg/about/lean-data/heart.png') 0 0 no-repeat;
-        .topic-image;
+        background: transparent url('/media/img/mozorg/about/lean-data/engage-users-icon.svg') 0 0 no-repeat;
+        .topic-image(130px, 130px);
     }
 }
 
 .toolkit {
-    padding: (@baseLine * 2) 0;
+    padding: (@baseLine * 6) 0 (@baseLine * 5);
     text-align: center;
 
     h3 {
@@ -169,24 +214,12 @@ main {
     }
 
     p {
-        .font-size(1.8rem);
-        line-height: 1.5;
+        margin: 0 auto 30px;
+        max-width: 600px;
+        .font-size(1.5rem);
+        line-height: 1.2;
         text-align: center;
         .open-sans-light;
-    }
-
-    li.implement-ldp:before {
-        .at2x('/media/img/mozorg/about/lean-data/doc.png', 55px, 80px);
-        background-repeat: no-repeat;
-        background-position: 50%;
-        .circular-image(#299CD3, 120px, 120px);
-    }
-
-    li.spreadsheet:before {
-        .at2x('/media/img/mozorg/about/lean-data/code.png', 55px, 80px);
-        background-repeat: no-repeat;
-        background-position: 50%;
-        .circular-image(#299CD3, 120px, 120px);
     }
 
     .simple-button:link,
