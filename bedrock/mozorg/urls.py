@@ -18,7 +18,7 @@ urlpatterns = (
     page('about/patents/license', 'mozorg/about/patents/license.html'),
     page('about/patents/guide', 'mozorg/about/patents/guide.html'),
     page('about', 'mozorg/about.html'),
-    page('about/lean-data', 'mozorg/about/lean-data.html'),
+    page('about/policy/lean-data', 'mozorg/about/policy/lean-data.html'),
     page('book', 'mozorg/book.html'),
     url('^credits/$', views.credits_view, name='mozorg.credits'),
     page('credits/faq', 'mozorg/credits-faq.html'),
