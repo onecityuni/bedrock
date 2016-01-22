@@ -1,13 +1,21 @@
 $(function() {
-    var $tooltipTrigger = $('.task h3');
+    var $tooltipTrigger = $('.tooltip-trigger');
+    var $currentItem = {};
+    var $tooltip = {};
 
     $tooltipTrigger.on('mouseenter', function() {
-        var $currentItem = $(this).parents('li');
-        $('.tooltip', $currentItem).removeClass('hidden');
+        $currentItem = $(this).parents('li');
+        $tooltip = $('.tooltip', $currentItem);
+
+        $tooltip.removeClass('hidden')
+                .attr('aria-hidden', false);
     });
 
     $tooltipTrigger.on('mouseleave', function() {
-        var $currentItem = $(this).parents('li');
-        $('.tooltip', $currentItem).addClass('hidden');
+        $currentItem = $(this).parents('li');
+        $tooltip = $('.tooltip', $currentItem);
+
+        $tooltip.addClass('hidden')
+                .attr('aria-hidden', true);
     });
 });
