@@ -45,7 +45,7 @@ main {
         width: 780px;
     }
 
-    @media only screen and (min-width: @breakMobile) and (max-width: @breakTablet) {
+    @media only screen and (max-width: @breakTablet) {
         width: 100%;
     }
 
@@ -64,6 +64,10 @@ main {
 
         @media only screen and (max-width: @breakMobileLandscape) {
             width: 260px;
+        }
+
+        @media only screen and (max-width: @breakMobile) {
+            width: 240px;
         }
     }
 
@@ -138,6 +142,15 @@ main {
         }
     }
 
+    h4 {
+        .font-size(1.5rem);
+
+        @media only screen and (max-width: @breakTablet) {
+            /* sandstone override */
+            .font-size(1.5rem);
+        }
+    }
+
     ol {
         margin: 0 auto;
         max-width: 600px;
@@ -192,7 +205,7 @@ main {
         width: 280px;
         vertical-align: top;
 
-        @media only screen and (min-width: @breakMobile) and (max-width: @breakDesktop) {
+        @media only screen and (max-width: @breakDesktop) {
             display: block;
             width: 100%;
         }
@@ -279,5 +292,12 @@ main {
         display: block;
         padding: 5px @baseLine;
         border: 1px solid #e0e0e0;
+    }
+}
+
+/* sandstone override for footer nav at 320px */
+@media only screen and (max-width: @breakMobile) {
+    #colophon .row {
+        width: 280px;
     }
 }
