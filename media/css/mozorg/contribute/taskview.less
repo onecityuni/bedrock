@@ -175,7 +175,7 @@ main {
     }
 
     header {
-        margin-top: -40px;
+        margin-top: -50px;
         margin-left: 70px;
 
         @media only screen and (max-width: @breakMobileLandscape) {
@@ -241,7 +241,7 @@ main {
 
     .download-button-wrapper {
         display: block;
-        margin: (@baseLine * 2) 0;
+        margin: @baseLine 0 0;
         text-align: center;
     }
 
@@ -278,7 +278,7 @@ video {
 
 /* sandstone override to hide feature-img */
 @media only screen and (max-width: 360px) {
-    .js img[data-high-res] {
+    .js img.feature-img[data-high-res] {
         display: none;
     }
 }
