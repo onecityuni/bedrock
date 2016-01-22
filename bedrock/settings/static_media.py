@@ -817,7 +817,7 @@ PIPELINE_CSS = {
     },
     'contribute-signup': {
         'source_filenames': (
-            'css/base/mozilla-modal.less',
+            'css/mozorg/contribute/contribute-common.less',
             'css/mozorg/contribute/signup.less',
         ),
         'output_filename': 'css/contribute-signup-bundle.css',
