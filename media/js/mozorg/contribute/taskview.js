@@ -18,7 +18,8 @@ $(function() {
     }
 
     /**
-     *
+     * Toggles the completed class on the relevant step, and calls
+     * taskComplete() if this was the final step of the task.
      */
     function completeStep($step) {
         var $stepOne = $('#step_one');
@@ -84,7 +85,6 @@ $(function() {
      * @param {int} variation - Whether is a v1 or v2 task.
      */
     function trackInteraction(interaction, variation) {
-        console.log('trackInteraction: ' + interaction, variation);
         window.dataLayer.push({
             event: 'get-involved-task-interaction',
             interaction: interaction,
@@ -128,14 +128,15 @@ $(function() {
      * Handles completion of Whimsy interaction steps.
      */
     function whimsy(event) {
-        var $this = $(event.target);
-
-        if ($this.data('action') === 'install') {
-            event.preventDefault();
-            // do stuff
+        // in step 1 we receive an event object that is part of a postMessage,
+        // and confirm that the action is install
+        if (event.data && event.data.action === 'install') {
             completeStep($this);
             trackInteraction('install whimsy', $this.data('variation'));
-        } else if ($this.data('action') === 'rate') {
+        // in step 2 we get an event object that is triggered via a link element.
+        // In this case, the action is read from a data attribute
+        } else if (event.target.dataset['action'] === 'rate') {
+            var $this = $(event.target);
             handleVisibilityChange($this);
             trackInteraction('AMO exit link', $this.data('variation'));
         }
@@ -237,6 +238,14 @@ $(function() {
     if ($signupTweetForm.length > 0) {
         initTweetForm();
     }
+
+    // The Whimsy addon install button lives on AMO and communicates with our page via a
+    // postMessage so, we have this special case event listener to respond to install events..
+    window.addEventListener('message', function(event) {
+        if ((event.data.action === 'install') && (event.data.addon === 'whimsy')) {
+            whimsy(event);
+        }
+    });
 
     $taskSteps.on('click', function(event) {
 
