@@ -5,6 +5,7 @@ $(function() {
     var $stepOne = $('#step_one');
     var $thankYou = $('#thankyou');
     var $getFirefox = $('.get-firefox');
+    var $actionButton = $('.action');
     var $downloadButton = $('.download-link');
 
     var $followButton = $('.follow-mozilla')
@@ -15,6 +16,8 @@ $(function() {
     // some tasks, like installing Whimsy, required the user to be using Firefox
     if ($getFirefox.length > -1 && !Mozilla.Client.isFirefox) {
         $getFirefox.toggleClass('hidden');
+        // hide any action buttons that forms part of the task.
+        $actionButton.addClass('hidden');
     }
 
     /**
