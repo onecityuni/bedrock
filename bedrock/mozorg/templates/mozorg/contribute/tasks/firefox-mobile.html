@@ -16,7 +16,7 @@
         <h3>{{ _('Add Firefox to your Android and iOS devices') }}</h3>
       </header>
       <div class="step-content">
-        <div class="download-button-wrapper">
+        <div class="download-button-wrapper firefox-mobile">
           <a rel="external" class="download-link" href="{{ settings.GOOGLE_PLAY_FIREFOX_LINK }}" target="_blank">
             {{ high_res_img('firefox/android/btn-google-play.png', {'alt': _('Get it on Google Play'), 'width': '129', 'height': '45', 'l10n': True, 'data-action': 'install', 'data-task': 'firefox-mobile', 'data-step': 'one', 'data-complete': 'true', 'data-variation': '1', 'data-mobileversion': 'Android'}) }}
           </a>
@@ -24,6 +24,7 @@
             <img src="{{ l10n_img('firefox/ios/btn-app-store.svg') }}" alt="{{ _('Download on the App Store') }}" width="152" height="45" data-action="install" data-task="firefox-mobile" data-step="one" data-complete="true" data-variation="1" data-mobileversion="iOS" />
           </a>
         </div>
+        {{ high_res_img('contribute/signup/firefox-mobile.png', {'width': '443', 'alt': '', 'class': 'feature-img'}) }}
       </div>
     </li>
   </ol>
