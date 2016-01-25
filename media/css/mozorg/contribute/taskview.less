@@ -133,19 +133,19 @@ main {
 .task-steps {
     margin: (@baseLine * 2) auto 0;
     list-style: none;
-    max-width: 80%;
+    max-width: 860px;
 
     @media only screen and (max-width: @breakDesktop) {
-        width: 90%;
-        max-width: inherit;
+        max-width: 720px;
     }
 
     @media only screen and (max-width: @breakTablet) {
-        width: 100%;
+        max-width: 600px;
     }
 
     li {
         margin: 0 0 (@baseLine * 2);
+        width: 80%;
 
         &:before {
             display: inline-block;
@@ -158,18 +158,11 @@ main {
             line-height: 2;
             text-align: center;
 
-            @media only screen and (max-width: @breakMobileLandscape) {
-                width: 40px;
-                height: 40px;
-                .font-size(21px);
-                line-height: 1.9;
-            }
-
-            @media only screen and (max-width: @breakMobileLandscape) {
+            @media only screen and (max-width: @breakTablet) {
                 width: 30px;
                 height: 30px;
                 .font-size(18px);
-                line-height: 1.5;
+                line-height: 1.6;
             }
         }
     }
@@ -177,9 +170,10 @@ main {
     header {
         margin-top: -50px;
         margin-left: 70px;
+        width: 100%;
 
-        @media only screen and (max-width: @breakMobileLandscape) {
-            margin-top: -35px;
+        @media only screen and (max-width: @breakTablet) {
+            margin-top: -32px;
             margin-left: 45px;
         }
     }
@@ -191,8 +185,22 @@ main {
         text-transform: uppercase;
         line-height: 1.3;
 
+        @media only screen and (max-width: @breakTablet) {
+            .font-size(24px);
+        }
+
         @media only screen and (max-width: @breakMobileLandscape) {
-            .font-size(28px);
+            .font-size(19px);
+        }
+    }
+
+    .step-content {
+        display: inline-block;;
+        margin-left: 70px;
+        width: 100%;
+
+        @media only screen and (max-width: @breakTablet) {
+            margin-left: 45px;
         }
     }
 
@@ -218,24 +226,10 @@ main {
         vertical-align: bottom;
     }
 
-    .step-content {
-        display: inline-block;;
-        margin-left: 70px;
-        width: 100%;
+    .feature-img {
+        margin: 0;
 
         @media only screen and (max-width: @breakMobileLandscape) {
-            margin-left: @baseLine * 2;
-        }
-    }
-
-    .feature-img {
-        margin: @baseLine 0;
-
-        @media only screen and (max-width: @breakTablet) {
-            width: 100%;
-        }
-
-        @media only screen and (max-width: 360px) {
             display: none;
         }
     }
@@ -256,6 +250,11 @@ main {
 
         @media only screen and (max-width: @breakMobileLandscape) {
             margin-bottom: @baseLine;
+            margin-left: 0;
+        }
+
+        &:first-child {
+            margin-left: 0;
         }
     }
 }
@@ -286,7 +285,7 @@ video {
 }
 
 /* sandstone override to hide feature-img */
-@media only screen and (max-width: 360px) {
+@media only screen and (max-width: @breakMobileLandscape) {
     .js img.feature-img[data-high-res] {
         display: none;
     }
@@ -328,7 +327,7 @@ a[role="button"] {
 
 /* Tweet form view */
 .tweet-form {
-    width: 85%;
+    width: 100%;
 
     fieldset {
         border: none;
@@ -341,9 +340,16 @@ a[role="button"] {
     textarea {
         margin-bottom: @baseLine;
         padding: 10px;
-        .font-size(1.2rem);
+        .font-size(16px);
         width: 100%;
         height: 100px;
+
+        @media only screen and (max-width: @breakMobileLandscape) {
+            height: 130px;
+        }
+    }
+    .char-counter {
+        .font-size(16px);
     }
 }
 
