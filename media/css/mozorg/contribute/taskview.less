@@ -264,8 +264,7 @@ video {
     margin-bottom: (@baseLine * 2);
     margin-left: 0;
     padding: 10px;
-    width: 600px;
-    height: 338px;
+    width: 100%;
 }
 
 .thankyou {
@@ -358,39 +357,58 @@ a[role="button"] {
     display: block;
     background-color: #0C99D5;
     color: #fff;
-    padding: 10px 4px;
+    margin-top: @baseLine;
+    padding: 15px;
     border: none;
     border-radius: 6px;
-    width: 250px;
-    .font-size(0.875rem);
+    width: auto;
+    max-width: 300px;
+    .font-size(14px);
     font-weight: bold;
     text-transform: uppercase;
     text-align: center;
     cursor: pointer;
     transition: background-color 0.3s ease 0s;
 
+    @media only screen and (max-width: 360px) {
+        .font-size(12px);
+    }
+
     &:link,
     &:visited {
+        color: #fff;
         text-decoration: none;
     }
 
     &:hover,
     &:focus {
         background-color: #2165A9;
-        color: #fff;
     }
-}
 
-.tweet-button {
-    &:before {
-        display: inline-block;
-        content: '';
-        .at2x('/media/img/mozorg/about/lean-data/github-icon.png', 40px, 40px);
+    /* additional specific styles for buttons that send a user
+       to Twitter */
+    &.twitter {
+        .at2x('/media/img/contribute/signup/twitter.png', 30px, 30px);
         background-repeat: no-repeat;
-        margin-right: 10px;
-        width: 40px;
-        height: 40px;
-        vertical-align: middle;
+        background-position: 10px 10px;
+        padding-left: 40px;
+    }
+
+    /* watch video play button on joy of coding task */
+    &.watch {
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    /* styles for the link on the build firefox os task views */
+    &.foxfooding {
+        margin-top: -45px;
+        width: 80%;
+        max-width: inherit;
+
+        @media only screen and (max-width: @breakMobileLandscape) {
+            margin-top: inherit;
+        }
     }
 }
 
